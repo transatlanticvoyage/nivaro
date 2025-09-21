@@ -141,6 +141,7 @@ class Nivaro_Coyote_Box_Extension {
                     'option_2' => __('Option 2 - Dynamic System', 'nivaro'),
                     'option_3' => __('Option 3 - Derive From Wombat System', 'nivaro'),
                     'option_4' => __('Option 4 - Ocelot Setup', 'nivaro'),
+                    'option_5' => __('Option 5 - Armadillo Setup', 'nivaro'),
                 ),
                 'default' => 'option_1',
                 'condition' => array(
@@ -288,6 +289,33 @@ class Nivaro_Coyote_Box_Extension {
                 'condition' => array(
                     'coyote_box_enable' => 'yes',
                     'coyote_box_producement_mode' => 'option_4',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_armadillo_note',
+            array(
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '
+                    <div style="background: #f0fff0; border: 1px solid #228b22; padding: 12px; border-radius: 4px; margin-top: 10px;">
+                        <div style="margin-bottom: 8px;">
+                            <strong>🦔 Armadillo Setup</strong><br>
+                            <strong>Widget-based approach for manual control:</strong>
+                        </div>
+                        <div style="font-size: 12px; line-height: 1.6; color: #555; margin-bottom: 8px;">
+                            This mode prepares the container for use with the companion <strong>Leatherback Widget</strong>. Add the Leatherback widget manually to this container for a grid of 8 editable service boxes. Each sub-widget can be individually customized.
+                        </div>
+                        <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
+                            <strong>Workflow:</strong> Enable Armadillo → Add Leatherback Widget → Customize each service box individually
+                        </div>
+                        <div style="font-size: 11px; background: #e8f5e8; padding: 6px; border-radius: 3px;">
+                            <strong>💡 Tip:</strong> Use this when you need granular control over each service box appearance and content
+                        </div>
+                    </div>',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                    'coyote_box_producement_mode' => 'option_5',
                 ),
             )
         );
@@ -493,6 +521,11 @@ class Nivaro_Coyote_Box_Extension {
             case 'option_4':
                 // Ocelot Setup - no background image, content will be auto-populated with widgets
                 // The container will be transformed into a services grid in the injection methods
+                break;
+                
+            case 'option_5':
+                // Armadillo Setup - prepare container for manual Leatherback widget insertion
+                // No auto-population, user will manually add Leatherback widget to container
                 break;
         }
         

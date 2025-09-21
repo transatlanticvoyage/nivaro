@@ -77,6 +77,11 @@ class Nivaro {
             require_once $ocelot_file;
         }
         
+        $leatherback_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-leatherback-widget.php';
+        if (file_exists($leatherback_file)) {
+            require_once $leatherback_file;
+        }
+        
         // Load container extensions
         $coyote_file = NIVARO_PLUGIN_PATH . 'includes/extensions/class-nivaro-coyote-box-extension.php';
         if (file_exists($coyote_file)) {
@@ -127,6 +132,15 @@ class Nivaro {
                 error_log('Nivaro: Failed to register Ocelot Service widget - ' . $e->getMessage());
             }
         }
+        
+        // Register Leatherback Widget
+        if (class_exists('Nivaro_Leatherback_Widget')) {
+            try {
+                $widgets_manager->register(new Nivaro_Leatherback_Widget());
+            } catch (Exception $e) {
+                error_log('Nivaro: Failed to register Leatherback widget - ' . $e->getMessage());
+            }
+        }
     }
     
     public function enqueue_assets() {
@@ -162,6 +176,15 @@ class Nivaro {
         wp_enqueue_style(
             'nivaro-ocelot-service',
             $ocelot_css,
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+        
+        // Enqueue Leatherback styles
+        $leatherback_css = NIVARO_PLUGIN_URL . 'assets/css/nivaro-leatherback.css';
+        wp_enqueue_style(
+            'nivaro-leatherback',
+            $leatherback_css,
             array(),
             NIVARO_PLUGIN_VERSION
         );
