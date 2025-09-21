@@ -108,47 +108,35 @@ class Nivaro_Coyote_Box_Extension {
         );
         
         $element->add_control(
-            'coyote_box_option_1',
+            'coyote_box_producement_mode',
             array(
-                'label' => __('<strong>Option 1 - default/fallback</strong>', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => __('On', 'nivaro'),
-                'label_off' => __('Off', 'nivaro'),
-                'return_value' => 'yes',
-                'default' => '',
+                'label' => __('Producement Mode', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => array(
+                    'option_1' => __('Option 1 - default/fallback', 'nivaro'),
+                    'option_2' => __('Option 2 - Dynamic System', 'nivaro'),
+                    'option_3' => __('Option 3 - Dynamic System', 'nivaro'),
+                ),
+                'default' => 'option_1',
                 'condition' => array(
                     'coyote_box_enable' => 'yes',
                 ),
+                'description' => __('Select how the container will derive its background image', 'nivaro'),
             )
         );
         
         $element->add_control(
-            'coyote_box_option_2',
+            'coyote_box_option_2_service_id',
             array(
-                'label' => __('<strong>Option 2 - Dynamic System</strong>', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => __('On', 'nivaro'),
-                'label_off' => __('Off', 'nivaro'),
-                'return_value' => 'yes',
+                'label' => __('Select Zen Service', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => $service_options,
                 'default' => '',
                 'condition' => array(
                     'coyote_box_enable' => 'yes',
+                    'coyote_box_producement_mode' => 'option_2',
                 ),
-            )
-        );
-        
-        $element->add_control(
-            'coyote_box_option_3',
-            array(
-                'label' => __('<strong>Option 3 - Dynamic System</strong>', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => __('On', 'nivaro'),
-                'label_off' => __('Off', 'nivaro'),
-                'return_value' => 'yes',
-                'default' => '',
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                ),
+                'description' => __('Select a service to use its image as background', 'nivaro'),
             )
         );
         
@@ -325,21 +313,31 @@ class Nivaro_Coyote_Box_Extension {
             $element->set_settings($key, $value);
         }
         
-        // Get background image URL
+        // Handle background based on producement mode
+        $producement_mode = $settings['coyote_box_producement_mode'] ?? 'option_1';
         $bg_image_url = '';
         
-        // First try to get from zen service
-        if (!empty($settings['coyote_box_service_id'])) {
-            $bg_image_url = $this->database->get_service_image_url($settings['coyote_box_service_id'], 'full');
+        switch ($producement_mode) {
+            case 'option_1':
+                // Use fallback/default behavior - rely on normal Elementor container background settings
+                // No dynamic background applied, container uses its own background settings
+                break;
+                
+            case 'option_2':
+                // Use zen service dynamic system
+                if (!empty($settings['coyote_box_option_2_service_id'])) {
+                    $bg_image_url = $this->database->get_service_image_url($settings['coyote_box_option_2_service_id'], 'full');
+                }
+                break;
+                
+            case 'option_3':
+                // Placeholder for option 3 functionality
+                // Will implement when you specify requirements
+                break;
         }
         
-        // If no service image, use fallback
-        if (empty($bg_image_url) && !empty($settings['coyote_box_fallback_image']['url'])) {
-            $bg_image_url = $settings['coyote_box_fallback_image']['url'];
-        }
-        
-        // Apply dynamic background
-        if (!empty($bg_image_url)) {
+        // Apply dynamic background only for option 2 and 3
+        if (!empty($bg_image_url) && $producement_mode !== 'option_1') {
             $element->add_render_attribute('_wrapper', 'style', 
                 'background-image: url(' . esc_url($bg_image_url) . ') !important; ' .
                 'background-position: top left !important; ' .
@@ -354,14 +352,18 @@ class Nivaro_Coyote_Box_Extension {
             'coyote-box-enabled',
         ));
         
-        if (!empty($settings['coyote_box_service_id'])) {
-            $element->add_render_attribute('_wrapper', 'class', 'coyote-box-service-' . $settings['coyote_box_service_id']);
+        // Add mode-specific classes and data
+        $element->add_render_attribute('_wrapper', 'class', 'coyote-box-mode-' . $producement_mode);
+        
+        if ($producement_mode === 'option_2' && !empty($settings['coyote_box_option_2_service_id'])) {
+            $element->add_render_attribute('_wrapper', 'class', 'coyote-box-service-' . $settings['coyote_box_option_2_service_id']);
         }
         
         // Add data attributes
         $element->add_render_attribute('_wrapper', array(
             'data-coyote-box' => 'enabled',
-            'data-coyote-service-id' => $settings['coyote_box_service_id'] ?? '',
+            'data-coyote-mode' => $producement_mode,
+            'data-coyote-service-id' => ($producement_mode === 'option_2') ? ($settings['coyote_box_option_2_service_id'] ?? '') : '',
         ));
     }
     
