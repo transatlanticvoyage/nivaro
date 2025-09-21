@@ -67,10 +67,17 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
             [
                 'type' => \Elementor\Controls_Manager::RAW_HTML,
                 'raw' => sprintf(
-                    __('<div style="background: #e7f3ff; border: 1px solid #007cba; padding: 12px; border-radius: 4px; margin: 10px 0;">
-                        <strong>📊 Database Info:</strong> Found <strong>%d services</strong> in your zen_services table<br>
-                        <small>You can auto-generate service boxes to match your database content</small>
-                    </div>', 'nivaro'),
+                    '<div style="background: #e7f3ff; border: 2px solid #007cba; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                        <div style="font-size: 14px; font-weight: bold; color: #007cba; margin-bottom: 8px;">
+                            📊 DATABASE STATUS
+                        </div>
+                        <div style="font-size: 13px; margin-bottom: 5px;">
+                            Found <strong style="color: #007cba;">%d services</strong> in your zen_services table
+                        </div>
+                        <div style="font-size: 11px; color: #666;">
+                            Ready for auto-generation ✓
+                        </div>
+                    </div>',
                     $services_count
                 ),
             ]
@@ -81,26 +88,40 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
             [
                 'type' => \Elementor\Controls_Manager::RAW_HTML,
                 'raw' => sprintf(
-                    __('<button type="button" id="leatherback-auto-generate" class="elementor-button elementor-button-default" style="width: 100%%; margin: 10px 0;">
-                        <i class="eicon-sync" style="margin-right: 5px;"></i>
-                        Auto-Generate %d Service Boxes from Database
-                    </button>
+                    '<div style="margin: 20px 0; text-align: center;">
+                        <div style="background: linear-gradient(135deg, #007cba, #005a87); padding: 3px; border-radius: 8px; margin-bottom: 10px;">
+                            <button type="button" 
+                                    id="leatherback-auto-generate" 
+                                    class="elementor-button elementor-button-default elementor-size-md" 
+                                    style="width: 100%%; padding: 15px; background: white; color: #007cba; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <i class="eicon-sync" style="margin-right: 10px; font-size: 16px;"></i>
+                                🚀 AUTO-GENERATE %d SERVICE BOXES
+                            </button>
+                        </div>
+                        <div style="font-size: 12px; color: #007cba; font-weight: bold;">
+                            ⚡ One-click database population
+                        </div>
+                        <div style="font-size: 11px; color: #666; margin-top: 3px;">
+                            Automatically creates and configures service boxes from zen_services table
+                        </div>
+                    </div>
                     <script>
                     jQuery(document).ready(function($) {
-                        $("#leatherback-auto-generate").on("click", function() {
-                            if (typeof leatherbackAutoGenerate === "function") {
-                                leatherbackAutoGenerate();
+                        console.log("Leatherback auto-generate button loaded");
+                        $(document).on("click", "#leatherback-auto-generate", function(e) {
+                            e.preventDefault();
+                            console.log("Auto-generate button clicked!");
+                            if (typeof window.leatherbackAutoGenerate === "function") {
+                                window.leatherbackAutoGenerate();
                             } else {
-                                alert("Auto-generation feature loading...");
+                                alert("Auto-generation system ready! Function status: " + typeof window.leatherbackAutoGenerate);
+                                console.log("leatherbackAutoGenerate function status:", typeof window.leatherbackAutoGenerate);
                             }
                         });
                     });
-                    </script>', 'nivaro'),
+                    </script>',
                     $services_count
                 ),
-                'condition' => [
-                    'leatherback_note!' => '',
-                ],
             ]
         );
         
