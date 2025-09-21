@@ -136,6 +136,7 @@ class Nivaro_Coyote_Box_Extension {
                     'option_1' => __('Option 1 - default/fallback', 'nivaro'),
                     'option_2' => __('Option 2 - Dynamic System', 'nivaro'),
                     'option_3' => __('Option 3 - Derive From Wombat System', 'nivaro'),
+                    'option_4' => __('Option 4 - Ocelot Setup', 'nivaro'),
                 ),
                 'default' => 'option_1',
                 'condition' => array(
@@ -259,6 +260,30 @@ class Nivaro_Coyote_Box_Extension {
                 'condition' => array(
                     'coyote_box_enable' => 'yes',
                     'coyote_box_producement_mode' => 'option_3',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_ocelot_note',
+            array(
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '
+                    <div style="background: #fff8dc; border: 1px solid #ff8c00; padding: 12px; border-radius: 4px; margin-top: 10px;">
+                        <div style="margin-bottom: 8px;">
+                            <strong>🐱 Ocelot Setup</strong><br>
+                            <strong>Auto-populate container with 8 service widgets:</strong>
+                        </div>
+                        <div style="font-size: 12px; line-height: 1.6; color: #555; margin-bottom: 8px;">
+                            This mode transforms the container into a dynamic grid displaying 8 service boxes. Each box shows service image, title, description, and button - all auto-populated from your zen services database. Perfect for service showcase sections.
+                        </div>
+                        <div style="font-size: 11px; color: #666;">
+                            <strong>Responsive Grid:</strong> 4 columns (desktop) → 3 columns (tablet) → 2 columns (mobile) → 1 column (small mobile)
+                        </div>
+                    </div>',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                    'coyote_box_producement_mode' => 'option_4',
                 ),
             )
         );
@@ -460,6 +485,11 @@ class Nivaro_Coyote_Box_Extension {
                     $bg_image_url = $this->database->get_wombat_image_url($current_post_id, 'full');
                 }
                 break;
+                
+            case 'option_4':
+                // Ocelot Setup - no background image, content will be auto-populated with widgets
+                // The container will be transformed into a services grid in the injection methods
+                break;
         }
         
         // Apply dynamic background only for option 2 and 3
@@ -525,24 +555,73 @@ class Nivaro_Coyote_Box_Extension {
         // Get the container's content
         $content = ob_get_clean();
         
-        // Output our structure
-        ?>
-        <!-- Coyote Box Structure -->
-        <div class="coyote-box-inner-wrapper">
-            <!-- Overlay -->
-            <div class="coyote-box-overlay"></div>
-            
-            <!-- Content Container -->
-            <div class="coyote-box-content-container">
-                <?php if (!empty($settings['coyote_box_heading'])): ?>
-                    <h1 class="coyote-box-heading">
-                        <?php echo esc_html($settings['coyote_box_heading']); ?>
-                    </h1>
-                <?php endif; ?>
+        $producement_mode = $settings['coyote_box_producement_mode'] ?? 'option_1';
+        
+        if ($producement_mode === 'option_4') {
+            // Option 4: Ocelot Setup - Auto-populate with 8 service widgets
+            $this->render_ocelot_services_grid();
+        } else {
+            // Default structure for other options
+            ?>
+            <!-- Coyote Box Structure -->
+            <div class="coyote-box-inner-wrapper">
+                <!-- Overlay -->
+                <div class="coyote-box-overlay"></div>
+                
+                <!-- Content Container -->
+                <div class="coyote-box-content-container">
+                    <?php if (!empty($settings['coyote_box_heading'])): ?>
+                        <h1 class="coyote-box-heading">
+                            <?php echo esc_html($settings['coyote_box_heading']); ?>
+                        </h1>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Original container content (if any widgets were added) -->
+                <?php echo $content; ?>
             </div>
-            
-            <!-- Original container content (if any widgets were added) -->
-            <?php echo $content; ?>
+            <?php
+        }
+    }
+    
+    /**
+     * Render Ocelot services grid for Option 4
+     */
+    private function render_ocelot_services_grid() {
+        // Get 8 services from database
+        $services = $this->database->get_ocelot_services(8);
+        
+        if (empty($services)) {
+            echo '<div class="ocelot-grid-placeholder">No services found for Ocelot grid.</div>';
+            return;
+        }
+        
+        ?>
+        <!-- Ocelot Services Grid -->
+        <div class="ocelot-services-grid">
+            <?php foreach ($services as $service): ?>
+                <div class="ocelot-service-box">
+                    <?php if (!empty($service->rel_image1_id)): ?>
+                        <div class="ocelot-service-image">
+                            <?php echo wp_get_attachment_image($service->rel_image1_id, 'medium', false, array('loading' => 'lazy')); ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="ocelot-service-content">
+                        <?php if (!empty($service->service_name)): ?>
+                            <h3 class="ocelot-service-title"><?php echo esc_html($service->service_name); ?></h3>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($service->service_placard)): ?>
+                            <p class="ocelot-service-description"><?php echo esc_html($service->service_placard); ?></p>
+                        <?php endif; ?>
+                        
+                        <div class="ocelot-service-button">
+                            <a href="#" class="ocelot-btn">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
         <?php
     }

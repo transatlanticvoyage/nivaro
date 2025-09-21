@@ -174,4 +174,31 @@ class Nivaro_Database {
         
         return $image_url ? $image_url : '';
     }
+    
+    /**
+     * Get services for Ocelot grid display
+     * Returns specified number of services with images for grid layout
+     */
+    public function get_ocelot_services($limit = 8) {
+        $table_name = $this->wpdb->prefix . 'zen_services';
+        
+        if (!$this->table_exists($table_name)) {
+            return array();
+        }
+        
+        $results = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT service_id, service_name, service_placard, rel_image1_id 
+                 FROM {$table_name} 
+                 WHERE service_name IS NOT NULL 
+                 AND rel_image1_id IS NOT NULL 
+                 AND rel_image1_id != 0
+                 ORDER BY service_name ASC 
+                 LIMIT %d",
+                $limit
+            )
+        );
+        
+        return $results ? $results : array();
+    }
 }

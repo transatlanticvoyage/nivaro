@@ -1,0 +1,317 @@
+/**
+ * Nivaro Ocelot Service Widget Styles
+ * Responsive grid layout for service boxes
+ */
+
+/* Ocelot Services Grid - Option 4 in Coyote Box */
+.ocelot-services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px 0;
+    width: 100%;
+}
+
+.ocelot-service-box {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.ocelot-service-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.ocelot-service-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.ocelot-service-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.ocelot-service-box:hover .ocelot-service-image img {
+    transform: scale(1.05);
+}
+
+.ocelot-service-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ocelot-service-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333333;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.ocelot-service-description {
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.6;
+    margin: 0 0 15px 0;
+    flex-grow: 1;
+}
+
+.ocelot-service-button {
+    margin-top: auto;
+}
+
+.ocelot-btn {
+    display: inline-block;
+    background: #007cba;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.ocelot-btn:hover {
+    background: #005a87;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* Placeholder when no services found */
+.ocelot-grid-placeholder {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    padding: 40px;
+    text-align: center;
+    color: #6c757d;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+/* Responsive Design */
+
+/* Large Tablets - 3 columns */
+@media (max-width: 1024px) {
+    .ocelot-services-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+}
+
+/* Tablets - 2 columns */
+@media (max-width: 768px) {
+    .ocelot-services-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        padding: 15px 0;
+    }
+    
+    .ocelot-service-image {
+        height: 180px;
+    }
+    
+    .ocelot-service-content {
+        padding: 15px;
+    }
+    
+    .ocelot-service-title {
+        font-size: 16px;
+    }
+    
+    .ocelot-service-description {
+        font-size: 13px;
+    }
+}
+
+/* Mobile - 1 column */
+@media (max-width: 480px) {
+    .ocelot-services-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 10px 0;
+    }
+    
+    .ocelot-service-image {
+        height: 160px;
+    }
+    
+    .ocelot-service-content {
+        padding: 12px;
+    }
+    
+    .ocelot-service-title {
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+    
+    .ocelot-service-description {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .ocelot-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Standalone Ocelot Widget Styles */
+.nivaro-ocelot-service-widget {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.nivaro-ocelot-service-widget:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.ocelot-widget-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.ocelot-widget-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.nivaro-ocelot-service-widget:hover .ocelot-widget-image img {
+    transform: scale(1.05);
+}
+
+.ocelot-widget-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ocelot-widget-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333333;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.ocelot-widget-description {
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.6;
+    margin: 0 0 15px 0;
+    flex-grow: 1;
+}
+
+.ocelot-widget-button {
+    margin-top: auto;
+}
+
+.ocelot-widget-btn {
+    display: inline-block;
+    background: #007cba;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.ocelot-widget-btn:hover {
+    background: #005a87;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* Placeholder for standalone widget */
+.ocelot-widget-placeholder {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    padding: 40px;
+    text-align: center;
+    color: #6c757d;
+    border-radius: 8px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.ocelot-widget-placeholder strong {
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Responsive styles for standalone widget */
+@media (max-width: 768px) {
+    .ocelot-widget-image {
+        height: 180px;
+    }
+    
+    .ocelot-widget-content {
+        padding: 15px;
+    }
+    
+    .ocelot-widget-title {
+        font-size: 16px;
+    }
+    
+    .ocelot-widget-description {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ocelot-widget-image {
+        height: 160px;
+    }
+    
+    .ocelot-widget-content {
+        padding: 12px;
+    }
+    
+    .ocelot-widget-title {
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+    
+    .ocelot-widget-description {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .ocelot-widget-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
