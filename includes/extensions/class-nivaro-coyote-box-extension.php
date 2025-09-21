@@ -39,6 +39,10 @@ class Nivaro_Coyote_Box_Extension {
         // AJAX handlers for editor background image retrieval
         add_action('wp_ajax_nivaro_get_service_image', array($this, 'ajax_get_service_image'));
         add_action('wp_ajax_nopriv_nivaro_get_service_image', array($this, 'ajax_get_service_image'));
+        
+        // AJAX handlers for Ocelot preview in editor
+        add_action('wp_ajax_nivaro_get_ocelot_preview', array($this, 'ajax_get_ocelot_preview'));
+        add_action('wp_ajax_nopriv_nivaro_get_ocelot_preview', array($this, 'ajax_get_ocelot_preview'));
     }
     
     /**
@@ -730,25 +734,76 @@ class Nivaro_Coyote_Box_Extension {
                 });
             }
             
+            // Function to show Ocelot preview in editor
+            function showOcelotPreview(containerId) {
+                // AJAX call to get Ocelot services for preview
+                $.ajax({
+                    url: nivaro_coyote_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'nivaro_get_ocelot_preview',
+                        container_id: containerId,
+                        nonce: nivaro_coyote_ajax.nonce
+                    },
+                    success: function(response) {
+                        if (response.success && response.data.html) {
+                            // Target the container in editor iframe
+                            var containerSelector = '[data-id="' + containerId + '"]';
+                            var $container = $(containerSelector);
+                            
+                            if ($container.length) {
+                                // Clear existing content and inject Ocelot grid
+                                $container.html(response.data.html);
+                                
+                                // Add Ocelot-specific styling
+                                $container.addClass('ocelot-preview-mode');
+                                $container.css({
+                                    'min-height': 'auto',
+                                    'padding': '20px'
+                                });
+                            }
+                        }
+                    },
+                    error: function() {
+                        // Show fallback preview
+                        var containerSelector = '[data-id="' + containerId + '"]';
+                        var $container = $(containerSelector);
+                        
+                        if ($container.length) {
+                            $container.html(
+                                '<div style="background: #fff8dc; border: 2px dashed #ff8c00; padding: 40px; text-align: center; border-radius: 8px;">' +
+                                '<h3 style="color: #ff8c00; margin: 0 0 10px 0;">🐱 Ocelot Preview</h3>' +
+                                '<p style="margin: 0; color: #666;">8 service boxes will display here on the frontend</p>' +
+                                '</div>'
+                            );
+                            $container.addClass('ocelot-preview-mode');
+                        }
+                    }
+                });
+            }
+            
             // Listen for Elementor panel changes
             if (typeof elementor !== 'undefined') {
                 elementor.hooks.addAction('panel/open_editor/widget', function(panel, model, view) {
                     // Handle container controls
                     if (model.get('elType') === 'container') {
                         var settings = model.get('settings');
-                        if (settings.get('coyote_box_enable') === 'yes' && 
-                            (settings.get('coyote_box_producement_mode') === 'option_2' || 
-                             settings.get('coyote_box_producement_mode') === 'option_3')) {
-                            
-                            var serviceId = settings.get('coyote_box_option_2_service_id');
-                            var bgSize = settings.get('coyote_box_background_size');
-                            var bgPosition = settings.get('coyote_box_background_position');
-                            var bgRepeat = settings.get('coyote_box_background_repeat');
-                            var containerId = model.get('id');
+                        if (settings.get('coyote_box_enable') === 'yes') {
                             var mode = settings.get('coyote_box_producement_mode');
+                            var containerId = model.get('id');
                             
-                            if ((mode === 'option_2' && serviceId) || mode === 'option_3') {
-                                updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode);
+                            if (mode === 'option_2' || mode === 'option_3') {
+                                var serviceId = settings.get('coyote_box_option_2_service_id');
+                                var bgSize = settings.get('coyote_box_background_size');
+                                var bgPosition = settings.get('coyote_box_background_position');
+                                var bgRepeat = settings.get('coyote_box_background_repeat');
+                                
+                                if ((mode === 'option_2' && serviceId) || mode === 'option_3') {
+                                    updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode);
+                                }
+                            } else if (mode === 'option_4') {
+                                // Handle Option 4 - Ocelot Setup
+                                showOcelotPreview(containerId);
                             }
                         }
                     }
@@ -760,20 +815,26 @@ class Nivaro_Coyote_Box_Extension {
                     var settings = model.get('settings');
                     
                     if (model.get('elType') === 'container' && 
-                        settings.get('coyote_box_enable') === 'yes' &&
-                        (settings.get('coyote_box_producement_mode') === 'option_2' || 
-                         settings.get('coyote_box_producement_mode') === 'option_3')) {
+                        settings.get('coyote_box_enable') === 'yes') {
                         
-                        var serviceId = settings.get('coyote_box_option_2_service_id');
-                        var bgSize = settings.get('coyote_box_background_size');
-                        var bgPosition = settings.get('coyote_box_background_position');
-                        var bgRepeat = settings.get('coyote_box_background_repeat');
-                        var containerId = model.get('id');
                         var mode = settings.get('coyote_box_producement_mode');
+                        var containerId = model.get('id');
                         
-                        if ((mode === 'option_2' && serviceId) || mode === 'option_3') {
+                        if (mode === 'option_2' || mode === 'option_3') {
+                            var serviceId = settings.get('coyote_box_option_2_service_id');
+                            var bgSize = settings.get('coyote_box_background_size');
+                            var bgPosition = settings.get('coyote_box_background_position');
+                            var bgRepeat = settings.get('coyote_box_background_repeat');
+                            
+                            if ((mode === 'option_2' && serviceId) || mode === 'option_3') {
+                                setTimeout(function() {
+                                    updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode);
+                                }, 100);
+                            }
+                        } else if (mode === 'option_4') {
+                            // Handle Option 4 - Ocelot Setup
                             setTimeout(function() {
-                                updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode);
+                                showOcelotPreview(containerId);
                             }, 100);
                         }
                     }
@@ -836,5 +897,78 @@ class Nivaro_Coyote_Box_Extension {
         } else {
             wp_send_json_error('No image found for ' . ($mode === 'option_3' ? 'current page in Wombat System' : 'selected service'));
         }
+    }
+    
+    /**
+     * AJAX handler to get Ocelot preview HTML for editor
+     */
+    public function ajax_get_ocelot_preview() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_coyote_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        $container_id = sanitize_text_field($_POST['container_id'] ?? '');
+        
+        // Get services for preview
+        $services = $this->database->get_ocelot_services(8);
+        
+        if (empty($services)) {
+            wp_send_json_success(array(
+                'html' => '<div style="background: #fff8dc; border: 2px dashed #ff8c00; padding: 40px; text-align: center; border-radius: 8px;">
+                            <h3 style="color: #ff8c00; margin: 0 0 10px 0;">🐱 Ocelot Preview</h3>
+                            <p style="margin: 0; color: #666;">No services found - check your zen_services table</p>
+                           </div>'
+            ));
+            return;
+        }
+        
+        // Generate preview HTML
+        ob_start();
+        ?>
+        <div class="ocelot-services-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 15px;">
+            <?php foreach ($services as $service): ?>
+                <div class="ocelot-service-box" style="background: #fff; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; font-size: 12px;">
+                    <?php if (!empty($service->rel_image1_id)): ?>
+                        <div style="width: 100%; height: 120px; overflow: hidden;">
+                            <?php echo wp_get_attachment_image($service->rel_image1_id, 'medium', false, array('style' => 'width: 100%; height: 100%; object-fit: cover;')); ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div style="padding: 12px;">
+                        <?php if (!empty($service->service_name)): ?>
+                            <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #333;"><?php echo esc_html($service->service_name); ?></h4>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($service->service_placard)): ?>
+                            <p style="margin: 0 0 8px 0; font-size: 11px; color: #666; line-height: 1.4;"><?php echo esc_html(wp_trim_words($service->service_placard, 8)); ?></p>
+                        <?php endif; ?>
+                        
+                        <div style="margin-top: 8px;">
+                            <span style="display: inline-block; background: #007cba; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 10px;">Learn More</span>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        
+        <style>
+        @media (max-width: 1200px) {
+            .ocelot-services-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (max-width: 768px) {
+            .ocelot-services-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) {
+            .ocelot-services-grid { grid-template-columns: 1fr !important; }
+        }
+        </style>
+        <?php
+        
+        $html = ob_get_clean();
+        
+        wp_send_json_success(array(
+            'html' => $html
+        ));
     }
 }
