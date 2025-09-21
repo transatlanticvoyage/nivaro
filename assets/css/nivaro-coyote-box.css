@@ -1,128 +1,171 @@
 /**
  * Nivaro Coyote Box Container Extension Styles
+ * Pre-configured to match exact template specifications
  */
 
-/* Base container styles when Coyote Box is enabled */
-.coyote-box-container {
+/* Force all settings when Coyote Box is enabled */
+.coyote-box-container.coyote-box-enabled {
+    /* Layout - Flexbox */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    
+    /* Dimensions */
+    min-height: 350px !important;
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    
+    /* Spacing */
+    padding: 50px 20px !important;
+    
+    /* Background defaults */
+    background-repeat: no-repeat !important;
+    background-position: top left !important;
+    background-size: cover !important;
+    
+    /* Positioning */
     position: relative !important;
-    min-height: 350px;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* Inner wrapper to contain all elements */
+.coyote-box-inner-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-repeat: no-repeat;
 }
 
-/* Preserve original container settings */
-.coyote-box-container.elementor-container {
-    /* These inherit from Elementor's container settings */
-}
-
-/* Overlay styles */
+/* Overlay with exact opacity */
 .coyote-box-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    background-color: #000000;
+    opacity: 0.7;
     pointer-events: none;
     z-index: 1;
 }
 
-/* Heading wrapper */
-.coyote-box-heading-wrapper {
+/* Content container */
+.coyote-box-content-container {
     position: relative;
     z-index: 2;
     width: 100%;
+    text-align: center;
     padding: 0;
 }
 
-/* Heading styles matching original */
+/* Heading with exact original styles */
 .coyote-box-heading {
     margin: 0;
     padding: 0;
-    color: #FFFFFF;
-    font-family: 'Poppins', sans-serif;
-    font-size: 64px;
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: -1.928px;
-    text-transform: capitalize;
-    text-align: center;
+    color: #FFFFFF !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 64px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    letter-spacing: -1.928px !important;
+    text-transform: capitalize !important;
+    text-align: center !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ensure content is above overlay */
-.coyote-box-container > * {
-    position: relative;
-    z-index: 2;
-}
+/* Import Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
 
-/* Tablet responsive */
+/* Tablet responsive (matches original) */
 @media (max-width: 1024px) {
-    .coyote-box-container {
-        min-height: 300px;
+    .coyote-box-container.coyote-box-enabled {
+        min-height: 300px !important;
     }
     
     .coyote-box-heading {
-        font-size: 50px;
-        letter-spacing: -1px;
+        font-size: 50px !important;
+        letter-spacing: -1px !important;
     }
 }
 
-/* Mobile responsive */
+/* Mobile responsive (matches original) */
 @media (max-width: 767px) {
-    .coyote-box-container {
-        min-height: 250px;
+    .coyote-box-container.coyote-box-enabled {
+        min-height: 250px !important;
     }
     
     .coyote-box-heading {
-        font-size: 38px;
-        line-height: 1.1;
+        font-size: 38px !important;
+        line-height: 1.1 !important;
     }
     
-    /* Mobile background position adjustment */
-    .coyote-box-container[style*="background-position: top left"] {
+    /* Mobile background position adjustment from original */
+    .coyote-box-container.coyote-box-enabled {
         background-position: 39% 0 !important;
     }
 }
 
-/* Elementor editor specific */
-.elementor-editor .coyote-box-container {
-    min-height: 350px;
-}
-
-/* Visual indicator in editor when enabled */
-.elementor-editor .coyote-box-container[data-coyote-box="enabled"]:not([style*="background-image"]) {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+/* Ensure z-index stacking works correctly */
+.coyote-box-container > .elementor-widget-wrap,
+.coyote-box-container > .e-con-inner {
     position: relative;
-}
-
-.elementor-editor .coyote-box-container[data-coyote-box="enabled"]:not([style*="background-image"])::after {
-    content: "Coyote Box: No background image";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    pointer-events: none;
     z-index: 3;
 }
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
-
-/* Fix z-index stacking */
-.coyote-box-container.elementor-element {
-    isolation: isolate;
+/* Handle any additional widgets added to the container */
+.coyote-box-container .elementor-widget {
+    position: relative;
+    z-index: 3;
 }
 
-/* Loading state */
-.coyote-box-container.coyote-loading::before {
+/* Editor-specific styles */
+.elementor-editor .coyote-box-container {
+    min-height: 350px !important;
+}
+
+/* Visual indicator in editor when no background */
+.elementor-editor .coyote-box-container[data-coyote-box="enabled"]:not([style*="background-image"]) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.elementor-editor .coyote-box-container[data-coyote-box="enabled"]:not([style*="background-image"])::before {
+    content: "Coyote Box: Select a service or upload fallback image";
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    z-index: 100;
+    pointer-events: none;
+}
+
+/* Service-specific helper classes */
+.coyote-box-service-1 {
+    /* Custom overrides for service 1 if needed */
+}
+
+.coyote-box-service-2 {
+    /* Custom overrides for service 2 if needed */
+}
+
+/* Loading animation */
+.coyote-box-container.coyote-loading::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -134,60 +177,47 @@
     border-top-color: #fff;
     border-radius: 50%;
     animation: coyote-spin 1s linear infinite;
-    z-index: 10;
+    z-index: 100;
 }
 
 @keyframes coyote-spin {
     to { transform: rotate(360deg); }
 }
 
-/* Service-specific helper classes */
-.coyote-box-service-1 {
-    /* Custom styles for service ID 1 */
+/* Override any conflicting Elementor styles */
+.coyote-box-enabled.elementor-section,
+.coyote-box-enabled.e-con,
+.coyote-box-enabled.e-container {
+    /* These rules ensure our styles take precedence */
 }
 
-.coyote-box-service-2 {
-    /* Custom styles for service ID 2 */
+/* Fix for Elementor's default container padding */
+.coyote-box-container.e-con > .e-con-inner {
+    padding: 0 !important;
+    width: 100%;
+    max-width: none;
 }
 
-/* Ensure proper stacking with container's own content */
-.coyote-box-container > .elementor-container-inner,
-.coyote-box-container > .elementor-widget-wrap {
+/* Ensure heading is always visible */
+.coyote-box-heading {
     position: relative;
-    z-index: 2;
+    z-index: 10;
 }
 
-/* Fix for nested containers */
-.coyote-box-container .elementor-element {
-    position: relative;
-    z-index: 2;
-}
-
-/* Transition effects */
-.coyote-box-container {
-    transition: background-image 0.3s ease;
-}
-
-/* Optional hover effect */
-.coyote-box-container:hover {
-    transform: none; /* Disable transform to not interfere with container settings */
-}
-
-/* Debug mode for development */
+/* Debug mode */
 body.coyote-debug .coyote-box-container {
-    border: 2px dashed #ff6b6b;
+    outline: 3px dashed #ff00ff;
 }
 
-body.coyote-debug .coyote-box-container::before {
-    content: "Coyote Box Active";
+body.coyote-debug .coyote-box-container::after {
+    content: "Coyote Box Debug Mode";
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
-    background: #ff6b6b;
+    background: #ff00ff;
     color: white;
     padding: 2px 8px;
     font-size: 10px;
     font-family: monospace;
-    z-index: 1000;
-    pointer-events: none;
+    z-index: 10000;
 }

@@ -2,7 +2,7 @@
 /**
  * Nivaro Coyote Box Container Extension
  * 
- * Adds dynamic zen service capabilities to Elementor containers
+ * Pre-configured container with exact replica settings and dynamic capabilities
  */
 
 if (!defined('ABSPATH')) {
@@ -19,12 +19,13 @@ class Nivaro_Coyote_Box_Extension {
         // Add controls to containers
         add_action('elementor/element/container/section_layout/after_section_end', array($this, 'add_coyote_box_controls'), 10, 2);
         
-        // Apply dynamic backgrounds before render
-        add_action('elementor/frontend/container/before_render', array($this, 'apply_coyote_box_background'));
-        add_action('elementor/element/container/before_render', array($this, 'apply_coyote_box_background'));
+        // Apply pre-configured settings when enabled
+        add_action('elementor/element/container/before_render', array($this, 'apply_coyote_box_settings'));
+        add_action('elementor/frontend/container/before_render', array($this, 'apply_coyote_box_settings'));
         
-        // Add custom CSS classes
-        add_action('elementor/frontend/container/before_render', array($this, 'add_coyote_box_classes'));
+        // Inject inner content structure
+        add_action('elementor/frontend/container/before_render', array($this, 'inject_coyote_content_start'));
+        add_action('elementor/frontend/container/after_render', array($this, 'inject_coyote_content_end'));
         
         // Enqueue frontend styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_coyote_styles'));
@@ -40,25 +41,62 @@ class Nivaro_Coyote_Box_Extension {
         // Get service options from database
         $service_options = $this->database->get_service_options();
         
-        // Add Coyote Box section
+        // Add Coyote Box section at the top of Layout tab
         $element->start_controls_section(
             'coyote_box_section',
             array(
-                'label' => __('Coyote Box Dynamic Background', 'nivaro'),
-                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                'label' => __('🦊 Coyote Box Template', 'nivaro'),
+                'tab' => \Elementor\Controls_Manager::TAB_LAYOUT,
             )
         );
         
         $element->add_control(
             'coyote_box_enable',
             array(
-                'label' => __('Enable Coyote Box', 'nivaro'),
+                'label' => __('Enable Coyote Box Template', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
                 'label_on' => __('Yes', 'nivaro'),
                 'label_off' => __('No', 'nivaro'),
                 'return_value' => 'yes',
                 'default' => '',
-                'description' => __('Enable dynamic background from zen services', 'nivaro'),
+                'description' => __('Transform this container into a pre-styled hero section with dynamic background', 'nivaro'),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_important_note',
+            array(
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => __('<strong>Note:</strong> When enabled, this will override container settings with pre-configured hero styling matching your template.', 'nivaro'),
+                'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->end_controls_section();
+        
+        // Add Dynamic Content section
+        $element->start_controls_section(
+            'coyote_box_content_section',
+            array(
+                'label' => __('Coyote Box Content', 'nivaro'),
+                'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_heading',
+            array(
+                'label' => __('Heading Text', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Your Heading Here', 'nivaro'),
+                'label_block' => true,
+                'description' => __('The main heading text displayed in the container', 'nivaro'),
             )
         );
         
@@ -69,48 +107,7 @@ class Nivaro_Coyote_Box_Extension {
                 'type' => \Elementor\Controls_Manager::SELECT,
                 'options' => $service_options,
                 'default' => '',
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                ),
                 'description' => __('Select a service to use its image as background', 'nivaro'),
-            )
-        );
-        
-        $element->add_control(
-            'coyote_box_heading',
-            array(
-                'label' => __('Coyote Box Heading', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::TEXT,
-                'default' => '',
-                'label_block' => true,
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                ),
-                'description' => __('Optional heading to display over the background', 'nivaro'),
-            )
-        );
-        
-        $element->add_control(
-            'coyote_box_heading_tag',
-            array(
-                'label' => __('Heading HTML Tag', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::SELECT,
-                'options' => array(
-                    'h1' => 'H1',
-                    'h2' => 'H2',
-                    'h3' => 'H3',
-                    'h4' => 'H4',
-                    'h5' => 'H5',
-                    'h6' => 'H6',
-                    'div' => 'div',
-                    'span' => 'span',
-                    'p' => 'p',
-                ),
-                'default' => 'h1',
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                    'coyote_box_heading!' => '',
-                ),
             )
         );
         
@@ -119,45 +116,77 @@ class Nivaro_Coyote_Box_Extension {
             array(
                 'label' => __('Fallback Background Image', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::MEDIA,
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                ),
                 'description' => __('Used when no service is selected or service has no image', 'nivaro'),
             )
         );
         
-        $element->add_control(
-            'coyote_box_overlay',
+        $element->end_controls_section();
+        
+        // Add Override Options section  
+        $element->start_controls_section(
+            'coyote_box_overrides_section',
             array(
-                'label' => __('Enable Overlay', 'nivaro'),
+                'label' => __('Coyote Box Overrides', 'nivaro'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_override_height',
+            array(
+                'label' => __('Override Min Height', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
-                'label_on' => __('Yes', 'nivaro'),
-                'label_off' => __('No', 'nivaro'),
+                'label_on' => __('Custom', 'nivaro'),
+                'label_off' => __('Default', 'nivaro'),
                 'return_value' => 'yes',
-                'default' => 'yes',
+                'default' => '',
+            )
+        );
+        
+        $element->add_responsive_control(
+            'coyote_box_custom_height',
+            array(
+                'label' => __('Custom Min Height', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px', 'vh'],
+                'range' => array(
+                    'px' => array(
+                        'min' => 100,
+                        'max' => 1000,
+                    ),
+                    'vh' => array(
+                        'min' => 10,
+                        'max' => 100,
+                    ),
+                ),
                 'condition' => array(
-                    'coyote_box_enable' => 'yes',
+                    'coyote_box_override_height' => 'yes',
+                ),
+                'selectors' => array(
+                    '{{WRAPPER}}.coyote-box-container' => 'min-height: {{SIZE}}{{UNIT}} !important;',
                 ),
             )
         );
         
         $element->add_control(
-            'coyote_box_overlay_color',
+            'coyote_box_override_overlay',
             array(
-                'label' => __('Overlay Color', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#000000',
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                    'coyote_box_overlay' => 'yes',
-                ),
+                'label' => __('Override Overlay Opacity', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Custom', 'nivaro'),
+                'label_off' => __('Default', 'nivaro'),
+                'return_value' => 'yes',
+                'default' => '',
             )
         );
         
         $element->add_control(
-            'coyote_box_overlay_opacity',
+            'coyote_box_custom_overlay_opacity',
             array(
-                'label' => __('Overlay Opacity', 'nivaro'),
+                'label' => __('Custom Overlay Opacity', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::SLIDER,
                 'range' => array(
                     'px' => array(
@@ -170,124 +199,10 @@ class Nivaro_Coyote_Box_Extension {
                     'size' => 0.7,
                 ),
                 'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                    'coyote_box_overlay' => 'yes',
+                    'coyote_box_override_overlay' => 'yes',
                 ),
-            )
-        );
-        
-        $element->add_control(
-            'coyote_box_bg_position',
-            array(
-                'label' => __('Background Position', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::SELECT,
-                'default' => 'top left',
-                'options' => array(
-                    'top left' => __('Top Left', 'nivaro'),
-                    'top center' => __('Top Center', 'nivaro'),
-                    'top right' => __('Top Right', 'nivaro'),
-                    'center left' => __('Center Left', 'nivaro'),
-                    'center center' => __('Center Center', 'nivaro'),
-                    'center right' => __('Center Right', 'nivaro'),
-                    'bottom left' => __('Bottom Left', 'nivaro'),
-                    'bottom center' => __('Bottom Center', 'nivaro'),
-                    'bottom right' => __('Bottom Right', 'nivaro'),
-                ),
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                ),
-            )
-        );
-        
-        $element->add_control(
-            'coyote_box_bg_size',
-            array(
-                'label' => __('Background Size', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::SELECT,
-                'default' => 'cover',
-                'options' => array(
-                    'auto' => __('Auto', 'nivaro'),
-                    'cover' => __('Cover', 'nivaro'),
-                    'contain' => __('Contain', 'nivaro'),
-                ),
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                ),
-            )
-        );
-        
-        // Heading styling controls
-        $element->add_control(
-            'coyote_box_heading_style',
-            array(
-                'label' => __('Heading Style', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::HEADING,
-                'separator' => 'before',
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                    'coyote_box_heading!' => '',
-                ),
-            )
-        );
-        
-        $element->add_control(
-            'coyote_box_heading_color',
-            array(
-                'label' => __('Heading Color', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#FFFFFF',
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                    'coyote_box_heading!' => '',
-                ),
-            )
-        );
-        
-        $element->add_group_control(
-            \Elementor\Group_Control_Typography::get_type(),
-            array(
-                'name' => 'coyote_box_heading_typography',
-                'label' => __('Typography', 'nivaro'),
-                'selector' => '{{WRAPPER}} .coyote-box-heading',
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                    'coyote_box_heading!' => '',
-                ),
-                'fields_options' => array(
-                    'typography' => array('default' => 'yes'),
-                    'font_family' => array('default' => 'Poppins'),
-                    'font_size' => array('default' => array('size' => 64, 'unit' => 'px')),
-                    'font_weight' => array('default' => '600'),
-                    'line_height' => array('default' => array('size' => 1, 'unit' => 'em')),
-                    'letter_spacing' => array('default' => array('size' => -1.928, 'unit' => 'px')),
-                    'text_transform' => array('default' => 'capitalize'),
-                ),
-            )
-        );
-        
-        $element->add_responsive_control(
-            'coyote_box_heading_align',
-            array(
-                'label' => __('Heading Alignment', 'nivaro'),
-                'type' => \Elementor\Controls_Manager::CHOOSE,
-                'options' => array(
-                    'left' => array(
-                        'title' => __('Left', 'nivaro'),
-                        'icon' => 'eicon-text-align-left',
-                    ),
-                    'center' => array(
-                        'title' => __('Center', 'nivaro'),
-                        'icon' => 'eicon-text-align-center',
-                    ),
-                    'right' => array(
-                        'title' => __('Right', 'nivaro'),
-                        'icon' => 'eicon-text-align-right',
-                    ),
-                ),
-                'default' => 'center',
-                'condition' => array(
-                    'coyote_box_enable' => 'yes',
-                    'coyote_box_heading!' => '',
+                'selectors' => array(
+                    '{{WRAPPER}} .coyote-box-overlay' => 'opacity: {{SIZE}} !important;',
                 ),
             )
         );
@@ -296,14 +211,41 @@ class Nivaro_Coyote_Box_Extension {
     }
     
     /**
-     * Apply dynamic background before render
+     * Apply pre-configured settings when Coyote Box is enabled
      */
-    public function apply_coyote_box_background($element) {
+    public function apply_coyote_box_settings($element) {
         $settings = $element->get_settings();
         
         // Check if Coyote Box is enabled
         if (empty($settings['coyote_box_enable']) || $settings['coyote_box_enable'] !== 'yes') {
             return;
+        }
+        
+        // Apply pre-configured container settings from original JSON
+        $pre_configured = array(
+            // Layout settings
+            'container_type' => 'flex',
+            'content_width' => 'boxed',
+            'boxed_width' => array('size' => 1200, 'unit' => 'px'),
+            'min_height' => array('size' => 350, 'unit' => 'px'),
+            'min_height_tablet' => array('size' => 300, 'unit' => 'px'),
+            'min_height_mobile' => array('size' => 250, 'unit' => 'px'),
+            'flex_direction' => 'column',
+            'flex_justify_content' => 'center',
+            'flex_align_items' => 'center',
+            'padding' => array(
+                'top' => '50',
+                'right' => '20',
+                'bottom' => '50',
+                'left' => '20',
+                'unit' => 'px',
+                'isLinked' => false,
+            ),
+        );
+        
+        // Force apply settings
+        foreach ($pre_configured as $key => $value) {
+            $element->set_settings($key, $value);
         }
         
         // Get background image URL
@@ -319,88 +261,80 @@ class Nivaro_Coyote_Box_Extension {
             $bg_image_url = $settings['coyote_box_fallback_image']['url'];
         }
         
-        // Apply dynamic styles
+        // Apply dynamic background
         if (!empty($bg_image_url)) {
-            $bg_position = $settings['coyote_box_bg_position'] ?? 'top left';
-            $bg_size = $settings['coyote_box_bg_size'] ?? 'cover';
-            
-            // Add inline styles for background
             $element->add_render_attribute('_wrapper', 'style', 
-                'background-image: url(' . esc_url($bg_image_url) . '); ' .
-                'background-position: ' . $bg_position . '; ' .
-                'background-size: ' . $bg_size . '; ' .
-                'background-repeat: no-repeat;'
+                'background-image: url(' . esc_url($bg_image_url) . ') !important; ' .
+                'background-position: top left !important; ' .
+                'background-size: cover !important; ' .
+                'background-repeat: no-repeat !important;'
             );
         }
         
-        // Add data attributes for JavaScript if needed
+        // Add CSS classes
+        $element->add_render_attribute('_wrapper', 'class', array(
+            'coyote-box-container',
+            'coyote-box-enabled',
+        ));
+        
+        if (!empty($settings['coyote_box_service_id'])) {
+            $element->add_render_attribute('_wrapper', 'class', 'coyote-box-service-' . $settings['coyote_box_service_id']);
+        }
+        
+        // Add data attributes
         $element->add_render_attribute('_wrapper', array(
             'data-coyote-box' => 'enabled',
             'data-coyote-service-id' => $settings['coyote_box_service_id'] ?? '',
-            'data-coyote-has-overlay' => $settings['coyote_box_overlay'] ?? '',
         ));
-        
-        // Add overlay HTML if enabled
-        if (!empty($settings['coyote_box_overlay']) && $settings['coyote_box_overlay'] === 'yes') {
-            $overlay_color = $settings['coyote_box_overlay_color'] ?? '#000000';
-            $overlay_opacity = $settings['coyote_box_overlay_opacity']['size'] ?? 0.7;
-            
-            add_action('elementor/frontend/container/after_render', function() use ($overlay_color, $overlay_opacity, $settings) {
-                ?>
-                <div class="coyote-box-overlay" style="
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: <?php echo esc_attr($overlay_color); ?>;
-                    opacity: <?php echo esc_attr($overlay_opacity); ?>;
-                    pointer-events: none;
-                    z-index: 1;
-                "></div>
-                <?php
-                
-                // Add heading if provided
-                if (!empty($settings['coyote_box_heading'])) {
-                    $heading_tag = $settings['coyote_box_heading_tag'] ?? 'h1';
-                    $heading_color = $settings['coyote_box_heading_color'] ?? '#FFFFFF';
-                    $heading_align = $settings['coyote_box_heading_align'] ?? 'center';
-                    ?>
-                    <div class="coyote-box-heading-wrapper" style="
-                        position: relative;
-                        z-index: 2;
-                        text-align: <?php echo esc_attr($heading_align); ?>;
-                        width: 100%;
-                    ">
-                        <<?php echo esc_html($heading_tag); ?> class="coyote-box-heading" style="
-                            color: <?php echo esc_attr($heading_color); ?>;
-                        ">
-                            <?php echo esc_html($settings['coyote_box_heading']); ?>
-                        </<?php echo esc_html($heading_tag); ?>>
-                    </div>
-                    <?php
-                }
-            }, 10, 0);
-        }
     }
     
     /**
-     * Add CSS classes to container
+     * Inject content structure start
      */
-    public function add_coyote_box_classes($element) {
+    public function inject_coyote_content_start($element) {
         $settings = $element->get_settings();
         
-        if (!empty($settings['coyote_box_enable']) && $settings['coyote_box_enable'] === 'yes') {
-            $element->add_render_attribute('_wrapper', 'class', 'coyote-box-container');
-            
-            if (!empty($settings['coyote_box_service_id'])) {
-                $element->add_render_attribute('_wrapper', 'class', 'coyote-box-service-' . $settings['coyote_box_service_id']);
-            }
-            
-            if (!empty($settings['coyote_box_overlay']) && $settings['coyote_box_overlay'] === 'yes') {
-                $element->add_render_attribute('_wrapper', 'class', 'coyote-box-has-overlay');
-            }
+        if (empty($settings['coyote_box_enable']) || $settings['coyote_box_enable'] !== 'yes') {
+            return;
         }
+        
+        // Start output buffering to inject our content
+        ob_start();
+    }
+    
+    /**
+     * Inject content structure end
+     */
+    public function inject_coyote_content_end($element) {
+        $settings = $element->get_settings();
+        
+        if (empty($settings['coyote_box_enable']) || $settings['coyote_box_enable'] !== 'yes') {
+            return;
+        }
+        
+        // Get the container's content
+        $content = ob_get_clean();
+        
+        // Output our structure
+        ?>
+        <!-- Coyote Box Structure -->
+        <div class="coyote-box-inner-wrapper">
+            <!-- Overlay -->
+            <div class="coyote-box-overlay"></div>
+            
+            <!-- Content Container -->
+            <div class="coyote-box-content-container">
+                <?php if (!empty($settings['coyote_box_heading'])): ?>
+                    <h1 class="coyote-box-heading">
+                        <?php echo esc_html($settings['coyote_box_heading']); ?>
+                    </h1>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Original container content (if any widgets were added) -->
+            <?php echo $content; ?>
+        </div>
+        <?php
     }
     
     /**
@@ -412,6 +346,14 @@ class Nivaro_Coyote_Box_Extension {
             NIVARO_PLUGIN_URL . 'assets/css/nivaro-coyote-box.css',
             array(),
             NIVARO_PLUGIN_VERSION
+        );
+        
+        // Enqueue Google Fonts
+        wp_enqueue_style(
+            'google-fonts-poppins',
+            'https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap',
+            array(),
+            null
         );
     }
 }
