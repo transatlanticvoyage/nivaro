@@ -67,6 +67,11 @@ class Nivaro {
             require_once $meerkat_file;
         }
         
+        $fox_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-fox-box-widget.php';
+        if (file_exists($fox_file)) {
+            require_once $fox_file;
+        }
+        
         // Load container extensions
         $coyote_file = NIVARO_PLUGIN_PATH . 'includes/extensions/class-nivaro-coyote-box-extension.php';
         if (file_exists($coyote_file)) {
@@ -99,6 +104,15 @@ class Nivaro {
                 error_log('Nivaro: Failed to register Meerkat Box widget - ' . $e->getMessage());
             }
         }
+        
+        // Register Fox Box Widget
+        if (class_exists('Nivaro_Fox_Box_Widget')) {
+            try {
+                $widgets_manager->register(new Nivaro_Fox_Box_Widget());
+            } catch (Exception $e) {
+                error_log('Nivaro: Failed to register Fox Box widget - ' . $e->getMessage());
+            }
+        }
     }
     
     public function enqueue_assets() {
@@ -116,6 +130,15 @@ class Nivaro {
         wp_enqueue_style(
             'nivaro-meerkat-box',
             $meerkat_css,
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+        
+        // Enqueue Fox Box styles
+        $fox_css = NIVARO_PLUGIN_URL . 'assets/css/nivaro-fox-box.css';
+        wp_enqueue_style(
+            'nivaro-fox-box',
+            $fox_css,
             array(),
             NIVARO_PLUGIN_VERSION
         );
