@@ -23,7 +23,7 @@ class Nivaro_Zen_Service_Widget extends \Elementor\Widget_Base {
     }
     
     public function get_title() {
-        return __('Zen Service Container', 'nivaro');
+        return __('Tortuga Widget', 'nivaro');
     }
     
     public function get_icon() {

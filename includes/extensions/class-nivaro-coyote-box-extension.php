@@ -76,6 +76,18 @@ class Nivaro_Coyote_Box_Extension {
         );
         
         $element->add_control(
+            'coyote_box_terminology_note',
+            array(
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => __('<strong>NOTE:</strong> This is a "container extension". It can be referred to as the Coyote Container Extension', 'nivaro'),
+                'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->add_control(
             'coyote_box_separator_1',
             array(
                 'type' => \Elementor\Controls_Manager::DIVIDER,
