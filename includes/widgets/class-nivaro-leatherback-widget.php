@@ -104,6 +104,17 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
                         <div style="font-size: 11px; color: #666; margin-top: 3px;">
                             Automatically creates and configures service boxes from zen_services table
                         </div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                            <button type="button" 
+                                    id="leatherback-debug-links" 
+                                    class="elementor-button elementor-button-default" 
+                                    style="width: 100%%; padding: 8px; background: #ff6b35; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                                🔍 Debug Service-Page Links
+                            </button>
+                            <div style="font-size: 10px; color: #666; margin-top: 3px; text-align: center;">
+                                Check database relationships for troubleshooting
+                            </div>
+                        </div>
                     </div>
                     <script>
                     jQuery(document).ready(function($) {
@@ -117,6 +128,37 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
                                 alert("Auto-generation system ready! Function status: " + typeof window.leatherbackAutoGenerate);
                                 console.log("leatherbackAutoGenerate function status:", typeof window.leatherbackAutoGenerate);
                             }
+                        });
+                        
+                        $(document).on("click", "#leatherback-debug-links", function(e) {
+                            e.preventDefault();
+                            console.log("Debug links button clicked!");
+                            
+                            $.ajax({
+                                url: nivaro_coyote_ajax.ajax_url,
+                                type: "POST",
+                                data: {
+                                    action: "nivaro_debug_links",
+                                    nonce: nivaro_coyote_ajax.nonce
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        console.log("Debug Info:", response.data.debug_info);
+                                        var debugText = "SERVICE-PAGE RELATIONSHIPS:\\n\\n";
+                                        response.data.debug_info.forEach(function(item) {
+                                            debugText += "Service: " + item.service_name + "\\n";
+                                            debugText += "  Service ID: " + item.service_id + "\\n";
+                                            debugText += "  Page ID: " + (item.asn_service_page_id || "NONE") + "\\n";
+                                            debugText += "  Page Found: " + (item.page_found ? "YES" : "NO") + "\\n";
+                                            debugText += "  Expected URL: " + item.expected_url + "\\n\\n";
+                                        });
+                                        alert(debugText);
+                                    }
+                                },
+                                error: function() {
+                                    alert("Debug request failed");
+                                }
+                            });
                         });
                     });
                     </script>',
@@ -615,7 +657,16 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
         $button_link = $settings["service_{$index}_button_link"] ?? ['url' => '#'];
         
         // Use dynamic link for auto mode, manual link for manual mode
-        $final_link = ($mode === 'auto' && $dynamic_link) ? $dynamic_link : $button_link['url'];
+        if ($mode === 'auto' && isset($dynamic_link) && $dynamic_link !== '#') {
+            $final_link = $dynamic_link;
+        } else {
+            $final_link = $button_link['url'] ?? '#';
+        }
+        
+        // Debug logging (remove in production)
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Leatherback Debug Box {$index}: Mode={$mode}, Service ID=" . ($service_id ?? 'none') . ", Dynamic Link=" . ($dynamic_link ?? 'none') . ", Final Link={$final_link}");
+        }
         
         ?>
         <div class="leatherback-service-box">

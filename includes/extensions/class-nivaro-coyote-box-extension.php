@@ -47,6 +47,10 @@ class Nivaro_Coyote_Box_Extension {
         // AJAX handlers for Leatherback auto-generation
         add_action('wp_ajax_nivaro_leatherback_auto_generate', array($this, 'ajax_leatherback_auto_generate'));
         add_action('wp_ajax_nopriv_nivaro_leatherback_auto_generate', array($this, 'ajax_leatherback_auto_generate'));
+        
+        // Debug AJAX handler
+        add_action('wp_ajax_nivaro_debug_links', array($this, 'ajax_debug_links'));
+        add_action('wp_ajax_nopriv_nivaro_debug_links', array($this, 'ajax_debug_links'));
     }
     
     /**
@@ -1056,14 +1060,35 @@ class Nivaro_Coyote_Box_Extension {
             $settings["service_{$box_number}_mode"] = 'auto';
             $settings["service_{$box_number}_auto_id"] = $service->service_id;
             $settings["service_{$box_number}_button_text"] = 'Learn More';
-            // Note: Dynamic links are automatically used in auto mode, no need to set button_link
-            $settings["service_{$box_number}_button_link"] = array('url' => $service->dynamic_link);
+            // Set the button link field to show the dynamic link in the controls
+            $settings["service_{$box_number}_button_link"] = array(
+                'url' => $service->dynamic_link,
+                'is_external' => false,
+                'nofollow' => false
+            );
         }
         
         wp_send_json_success(array(
             'services_count' => $services_count,
             'settings' => $settings,
             'message' => sprintf('Successfully configured %d service boxes with dynamic links from database', $services_count)
+        ));
+    }
+    
+    /**
+     * Debug AJAX handler to check service-page relationships
+     */
+    public function ajax_debug_links() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_coyote_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        $debug_info = $this->database->debug_service_page_relationships();
+        
+        wp_send_json_success(array(
+            'debug_info' => $debug_info,
+            'message' => 'Debug information retrieved'
         ));
     }
 }

@@ -264,6 +264,11 @@ class Nivaro_Database {
             )
         );
         
+        // Debug logging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Nivaro Debug: Service ID {$service_id} → asn_service_page_id: " . ($page_id ?? 'NULL'));
+        }
+        
         if (!$page_id) {
             return '#';
         }
@@ -284,15 +289,22 @@ class Nivaro_Database {
         if ($post->post_status === 'publish') {
             // Published page - use clean URL
             if ($post->post_type === 'page') {
-                return home_url('/' . $post->post_name . '/');
+                $url = home_url('/' . $post->post_name . '/');
             } else {
                 // For posts or custom post types
-                return get_permalink($post->ID);
+                $url = get_permalink($post->ID);
             }
         } else {
             // Draft/unpublished - use preview URL
-            return home_url('/?page_id=' . $post->ID . '&preview=true');
+            $url = home_url('/?page_id=' . $post->ID . '&preview=true');
         }
+        
+        // Debug logging (remove in production)
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Nivaro Debug: Service ID {$service_id} → Page ID {$page_id} → URL: {$url}");
+        }
+        
+        return $url;
     }
     
     /**
@@ -323,5 +335,52 @@ class Nivaro_Database {
         }
         
         return $services;
+    }
+    
+    /**
+     * Debug method to check service-to-page relationships
+     * This will help identify why links aren't working
+     */
+    public function debug_service_page_relationships() {
+        $zen_table = $this->wpdb->prefix . 'zen_services';
+        $posts_table = $this->wpdb->prefix . 'posts';
+        
+        if (!$this->table_exists($zen_table)) {
+            return array('error' => 'zen_services table not found');
+        }
+        
+        // Get all services with their page relationships
+        $results = $this->wpdb->get_results(
+            "SELECT 
+                zs.service_id,
+                zs.service_name,
+                zs.asn_service_page_id,
+                p.ID as post_id,
+                p.post_title,
+                p.post_name,
+                p.post_status,
+                p.post_type
+             FROM {$zen_table} zs
+             LEFT JOIN {$posts_table} p ON zs.asn_service_page_id = p.ID
+             WHERE zs.service_name IS NOT NULL
+             ORDER BY zs.service_id ASC
+             LIMIT 10"
+        );
+        
+        $debug_info = array();
+        foreach ($results as $row) {
+            $debug_info[] = array(
+                'service_id' => $row->service_id,
+                'service_name' => $row->service_name,
+                'asn_service_page_id' => $row->asn_service_page_id,
+                'page_found' => !empty($row->post_id),
+                'post_title' => $row->post_title,
+                'post_name' => $row->post_name,
+                'post_status' => $row->post_status,
+                'expected_url' => $row->post_name ? home_url('/' . $row->post_name . '/') : 'No URL possible'
+            );
+        }
+        
+        return $debug_info;
     }
 }
