@@ -43,6 +43,10 @@ class Nivaro_Coyote_Box_Extension {
         // AJAX handlers for Ocelot preview in editor
         add_action('wp_ajax_nivaro_get_ocelot_preview', array($this, 'ajax_get_ocelot_preview'));
         add_action('wp_ajax_nopriv_nivaro_get_ocelot_preview', array($this, 'ajax_get_ocelot_preview'));
+        
+        // AJAX handlers for Leatherback auto-generation
+        add_action('wp_ajax_nivaro_leatherback_auto_generate', array($this, 'ajax_leatherback_auto_generate'));
+        add_action('wp_ajax_nopriv_nivaro_leatherback_auto_generate', array($this, 'ajax_leatherback_auto_generate'));
     }
     
     /**
@@ -695,8 +699,23 @@ class Nivaro_Coyote_Box_Extension {
             true
         );
         
+        wp_enqueue_script(
+            'nivaro-leatherback-editor',
+            NIVARO_PLUGIN_URL . 'assets/js/nivaro-leatherback-editor.js',
+            array('jquery', 'elementor-editor'),
+            NIVARO_PLUGIN_VERSION,
+            true
+        );
+        
         // Localize script with AJAX data
         wp_localize_script('nivaro-coyote-editor', 'nivaro_coyote_ajax', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('nivaro_coyote_nonce'),
+            'action' => 'nivaro_get_service_image'
+        ));
+        
+        // Localize Leatherback script with same AJAX data
+        wp_localize_script('nivaro-leatherback-editor', 'nivaro_coyote_ajax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('nivaro_coyote_nonce'),
             'action' => 'nivaro_get_service_image'
@@ -1002,6 +1021,44 @@ class Nivaro_Coyote_Box_Extension {
         
         wp_send_json_success(array(
             'html' => $html
+        ));
+    }
+    
+    /**
+     * AJAX handler for Leatherback auto-generation
+     */
+    public function ajax_leatherback_auto_generate() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_coyote_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        // Get all services from database
+        $services = $this->database->get_all_services_for_leatherback();
+        $services_count = count($services);
+        
+        if (empty($services)) {
+            wp_send_json_error('No services found in database');
+        }
+        
+        // Prepare settings array for auto-generation
+        $settings = array(
+            'box_count' => $services_count
+        );
+        
+        // Auto-assign service IDs to each box
+        foreach ($services as $index => $service) {
+            $box_number = $index + 1;
+            $settings["service_{$box_number}_mode"] = 'auto';
+            $settings["service_{$box_number}_auto_id"] = $service->service_id;
+            $settings["service_{$box_number}_button_text"] = 'Learn More';
+            $settings["service_{$box_number}_button_link"] = array('url' => '#');
+        }
+        
+        wp_send_json_success(array(
+            'services_count' => $services_count,
+            'settings' => $settings,
+            'message' => sprintf('Successfully configured %d service boxes from database', $services_count)
         ));
     }
 }

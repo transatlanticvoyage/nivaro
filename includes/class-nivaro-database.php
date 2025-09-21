@@ -201,4 +201,42 @@ class Nivaro_Database {
         
         return $results ? $results : array();
     }
+    
+    /**
+     * Get all services for Leatherback auto-generation
+     * Returns all services from database for dynamic population
+     */
+    public function get_all_services_for_leatherback() {
+        $table_name = $this->wpdb->prefix . 'zen_services';
+        
+        if (!$this->table_exists($table_name)) {
+            return array();
+        }
+        
+        $results = $this->wpdb->get_results(
+            "SELECT service_id, service_name, service_placard, rel_image1_id 
+             FROM {$table_name} 
+             WHERE service_name IS NOT NULL 
+             ORDER BY service_name ASC"
+        );
+        
+        return $results ? $results : array();
+    }
+    
+    /**
+     * Get count of all services in database
+     */
+    public function get_services_count() {
+        $table_name = $this->wpdb->prefix . 'zen_services';
+        
+        if (!$this->table_exists($table_name)) {
+            return 0;
+        }
+        
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$table_name} WHERE service_name IS NOT NULL"
+        );
+        
+        return intval($count);
+    }
 }

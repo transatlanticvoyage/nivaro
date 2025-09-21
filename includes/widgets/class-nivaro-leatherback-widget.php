@@ -54,8 +54,53 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
             'leatherback_note',
             [
                 'type' => \Elementor\Controls_Manager::RAW_HTML,
-                'raw' => __('<strong>🐢 Leatherback Widget</strong><br>This widget contains 8 individual service boxes that you can customize separately. Perfect for use with Armadillo Setup (Option 5) in Coyote Box containers.', 'nivaro'),
+                'raw' => __('<strong>🐢 Leatherback Widget</strong><br>This widget contains individual service boxes that you can customize separately. Perfect for use with Armadillo Setup (Option 5) in Coyote Box containers.', 'nivaro'),
                 'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+            ]
+        );
+        
+        // Get current service count from database
+        $services_count = $this->database->get_services_count();
+        
+        $this->add_control(
+            'auto_generate_info',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => sprintf(
+                    __('<div style="background: #e7f3ff; border: 1px solid #007cba; padding: 12px; border-radius: 4px; margin: 10px 0;">
+                        <strong>📊 Database Info:</strong> Found <strong>%d services</strong> in your zen_services table<br>
+                        <small>You can auto-generate service boxes to match your database content</small>
+                    </div>', 'nivaro'),
+                    $services_count
+                ),
+            ]
+        );
+        
+        $this->add_control(
+            'auto_generate_button',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => sprintf(
+                    __('<button type="button" id="leatherback-auto-generate" class="elementor-button elementor-button-default" style="width: 100%%; margin: 10px 0;">
+                        <i class="eicon-sync" style="margin-right: 5px;"></i>
+                        Auto-Generate %d Service Boxes from Database
+                    </button>
+                    <script>
+                    jQuery(document).ready(function($) {
+                        $("#leatherback-auto-generate").on("click", function() {
+                            if (typeof leatherbackAutoGenerate === "function") {
+                                leatherbackAutoGenerate();
+                            } else {
+                                alert("Auto-generation feature loading...");
+                            }
+                        });
+                    });
+                    </script>', 'nivaro'),
+                    $services_count
+                ),
+                'condition' => [
+                    'leatherback_note!' => '',
+                ],
             ]
         );
         
@@ -65,9 +110,9 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
                 'label' => __('Number of Service Boxes', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::NUMBER,
                 'default' => 8,
-                'min' => 1,
-                'max' => 12,
-                'description' => __('How many service boxes to display (1-12)', 'nivaro'),
+                'min' => 0,
+                'max' => 30,
+                'description' => __('How many service boxes to display (0-30)', 'nivaro'),
             ]
         );
         
@@ -76,15 +121,15 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
         // Service Options
         $service_options = $this->database->get_service_options();
         
-        // Individual Service Box Controls (8 boxes)
-        for ($i = 1; $i <= 8; $i++) {
+        // Individual Service Box Controls (up to 30 boxes)
+        for ($i = 1; $i <= 30; $i++) {
             $this->start_controls_section(
                 "service_box_{$i}_section",
                 [
                     'label' => __("Service Box {$i}", 'nivaro'),
                     'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
                     'condition' => [
-                        'box_count' => range($i, 12)
+                        'box_count' => range($i, 30)
                     ],
                 ]
             );
