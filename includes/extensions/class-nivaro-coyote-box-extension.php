@@ -31,6 +31,14 @@ class Nivaro_Coyote_Box_Extension {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_coyote_styles'));
         add_action('elementor/preview/enqueue_styles', array($this, 'enqueue_coyote_styles'));
         add_action('elementor/editor/after_enqueue_styles', array($this, 'enqueue_coyote_styles'));
+        
+        // Editor-specific hooks for background image visibility
+        add_action('elementor/editor/after_enqueue_scripts', array($this, 'enqueue_editor_scripts'));
+        add_action('elementor/editor/footer', array($this, 'editor_background_handler'));
+        
+        // AJAX handlers for editor background image retrieval
+        add_action('wp_ajax_nivaro_get_service_image', array($this, 'ajax_get_service_image'));
+        add_action('wp_ajax_nopriv_nivaro_get_service_image', array($this, 'ajax_get_service_image'));
     }
     
     /**
@@ -446,5 +454,144 @@ class Nivaro_Coyote_Box_Extension {
             array(),
             null
         );
+    }
+    
+    /**
+     * Enqueue editor scripts for background image handling
+     */
+    public function enqueue_editor_scripts() {
+        wp_enqueue_script(
+            'nivaro-coyote-editor',
+            NIVARO_PLUGIN_URL . 'assets/js/nivaro-coyote-editor.js',
+            array('jquery', 'elementor-editor'),
+            NIVARO_PLUGIN_VERSION,
+            true
+        );
+        
+        // Localize script with AJAX data
+        wp_localize_script('nivaro-coyote-editor', 'nivaro_coyote_ajax', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('nivaro_coyote_nonce'),
+            'action' => 'nivaro_get_service_image'
+        ));
+    }
+    
+    /**
+     * Editor background handler - inject dynamic CSS for editor
+     */
+    public function editor_background_handler() {
+        ?>
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            // Function to update container background in editor
+            function updateCoyoteBackground(containerId, serviceId) {
+                if (!serviceId) return;
+                
+                // AJAX call to get service image URL
+                $.ajax({
+                    url: nivaro_coyote_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: nivaro_coyote_ajax.action,
+                        service_id: serviceId,
+                        nonce: nivaro_coyote_ajax.nonce
+                    },
+                    success: function(response) {
+                        if (response.success && response.data.image_url) {
+                            var imageUrl = response.data.image_url;
+                            
+                            // Target the container in editor iframe
+                            var containerSelector = '[data-id="' + containerId + '"]';
+                            var $container = $(containerSelector);
+                            
+                            if ($container.length) {
+                                // Apply background image with high specificity
+                                $container.css({
+                                    'background-image': 'url(' + imageUrl + ') !important',
+                                    'background-position': 'top left !important',
+                                    'background-size': 'cover !important',
+                                    'background-repeat': 'no-repeat !important'
+                                });
+                                
+                                // Also inject as inline style for higher priority
+                                var inlineStyle = 'background-image: url(' + imageUrl + ') !important; ' +
+                                                'background-position: top left !important; ' +
+                                                'background-size: cover !important; ' +
+                                                'background-repeat: no-repeat !important;';
+                                
+                                $container.attr('style', ($container.attr('style') || '') + inlineStyle);
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Listen for Elementor panel changes
+            if (typeof elementor !== 'undefined') {
+                elementor.hooks.addAction('panel/open_editor/widget', function(panel, model, view) {
+                    // Handle container controls
+                    if (model.get('elType') === 'container') {
+                        var settings = model.get('settings');
+                        if (settings.get('coyote_box_enable') === 'yes' && 
+                            settings.get('coyote_box_producement_mode') === 'option_2') {
+                            
+                            var serviceId = settings.get('coyote_box_option_2_service_id');
+                            var containerId = model.get('id');
+                            
+                            if (serviceId) {
+                                updateCoyoteBackground(containerId, serviceId);
+                            }
+                        }
+                    }
+                });
+                
+                // Listen for setting changes
+                elementor.hooks.addAction('panel/editor/change', function(controlView, elementView) {
+                    var model = elementView.model;
+                    var settings = model.get('settings');
+                    
+                    if (model.get('elType') === 'container' && 
+                        settings.get('coyote_box_enable') === 'yes' &&
+                        settings.get('coyote_box_producement_mode') === 'option_2') {
+                        
+                        var serviceId = settings.get('coyote_box_option_2_service_id');
+                        var containerId = model.get('id');
+                        
+                        if (serviceId) {
+                            setTimeout(function() {
+                                updateCoyoteBackground(containerId, serviceId);
+                            }, 100);
+                        }
+                    }
+                });
+            }
+        });
+        </script>
+        <?php
+    }
+    
+    /**
+     * AJAX handler to get service image URL for editor
+     */
+    public function ajax_get_service_image() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_coyote_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        $service_id = sanitize_text_field($_POST['service_id']);
+        
+        if (empty($service_id)) {
+            wp_send_json_error('No service ID provided');
+        }
+        
+        // Get image URL using existing database method
+        $image_url = $this->database->get_service_image_url($service_id, 'full');
+        
+        if (!empty($image_url)) {
+            wp_send_json_success(array('image_url' => $image_url));
+        } else {
+            wp_send_json_error('No image found for service');
+        }
     }
 }
