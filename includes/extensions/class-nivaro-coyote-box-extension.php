@@ -75,6 +75,83 @@ class Nivaro_Coyote_Box_Extension {
             )
         );
         
+        $element->add_control(
+            'coyote_box_separator_1',
+            array(
+                'type' => \Elementor\Controls_Manager::DIVIDER,
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_producement_heading',
+            array(
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => __('producement options', 'nivaro'),
+                'content_classes' => 'elementor-control-field-description',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_separator_2',
+            array(
+                'type' => \Elementor\Controls_Manager::DIVIDER,
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_option_1',
+            array(
+                'label' => __('<strong>Option 1 - default/fallback</strong>', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('On', 'nivaro'),
+                'label_off' => __('Off', 'nivaro'),
+                'return_value' => 'yes',
+                'default' => '',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_option_2',
+            array(
+                'label' => __('<strong>Option 2 - Dynamic System</strong>', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('On', 'nivaro'),
+                'label_off' => __('Off', 'nivaro'),
+                'return_value' => 'yes',
+                'default' => '',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_option_3',
+            array(
+                'label' => __('<strong>Option 3 - Dynamic System</strong>', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('On', 'nivaro'),
+                'label_off' => __('Off', 'nivaro'),
+                'return_value' => 'yes',
+                'default' => '',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                ),
+            )
+        );
+        
         $element->end_controls_section();
         
         // Add Dynamic Content section
