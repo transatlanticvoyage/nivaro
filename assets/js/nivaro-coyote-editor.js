@@ -77,10 +77,13 @@
                 settings.get('coyote_box_producement_mode') === 'option_2') {
                 
                 var serviceId = settings.get('coyote_box_option_2_service_id');
+                var bgSize = settings.get('coyote_box_background_size');
+                var bgPosition = settings.get('coyote_box_background_position');
+                var bgRepeat = settings.get('coyote_box_background_repeat');
                 var containerId = model.get('id');
                 
                 if (serviceId) {
-                    this.updateBackground(containerId, serviceId);
+                    this.updateBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat);
                 } else {
                     this.clearBackground(containerId);
                 }
@@ -90,18 +93,26 @@
         /**
          * Update container background with service image
          */
-        updateBackground: function(containerId, serviceId) {
+        updateBackground: function(containerId, serviceId, bgSize, bgPosition, bgRepeat) {
+            // Set defaults
+            bgSize = bgSize || 'cover';
+            bgPosition = bgPosition || 'center center';
+            bgRepeat = bgRepeat || 'no-repeat';
+            
             $.ajax({
                 url: nivaro_coyote_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: nivaro_coyote_ajax.action,
                     service_id: serviceId,
+                    bg_size: bgSize,
+                    bg_position: bgPosition,
+                    bg_repeat: bgRepeat,
                     nonce: nivaro_coyote_ajax.nonce
                 },
                 success: function(response) {
                     if (response.success && response.data.image_url) {
-                        this.applyBackgroundToContainer(containerId, response.data.image_url);
+                        this.applyBackgroundToContainer(containerId, response.data.image_url, response.data.bg_size, response.data.bg_position, response.data.bg_repeat);
                     }
                 }.bind(this),
                 error: function(xhr, status, error) {
@@ -113,7 +124,12 @@
         /**
          * Apply background image to container in editor
          */
-        applyBackgroundToContainer: function(containerId, imageUrl) {
+        applyBackgroundToContainer: function(containerId, imageUrl, bgSize, bgPosition, bgRepeat) {
+            // Set defaults
+            bgSize = bgSize || 'cover';
+            bgPosition = bgPosition || 'center center';
+            bgRepeat = bgRepeat || 'no-repeat';
+            
             // Target container in editor preview iframe
             var $previewFrame = $('#elementor-preview-iframe');
             var $container;
@@ -128,16 +144,16 @@
             if ($container.length) {
                 // Apply background with high specificity
                 var backgroundStyle = 'background-image: url(' + imageUrl + ') !important; ' +
-                                    'background-position: top left !important; ' +
-                                    'background-size: cover !important; ' +
-                                    'background-repeat: no-repeat !important;';
+                                    'background-position: ' + bgPosition + ' !important; ' +
+                                    'background-size: ' + bgSize + ' !important; ' +
+                                    'background-repeat: ' + bgRepeat + ' !important;';
                 
                 // Set via CSS
                 $container.css({
                     'background-image': 'url(' + imageUrl + ')',
-                    'background-position': 'top left',
-                    'background-size': 'cover',
-                    'background-repeat': 'no-repeat'
+                    'background-position': bgPosition,
+                    'background-size': bgSize,
+                    'background-repeat': bgRepeat
                 });
                 
                 // Also set as inline style for maximum priority

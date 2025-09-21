@@ -160,6 +160,71 @@ class Nivaro_Coyote_Box_Extension {
             )
         );
         
+        $element->add_control(
+            'coyote_box_background_size',
+            array(
+                'label' => __('Background Size', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => array(
+                    'cover' => __('Cover', 'nivaro'),
+                    'contain' => __('Contain', 'nivaro'),
+                    'auto' => __('Auto', 'nivaro'),
+                    '100% 100%' => __('Stretch', 'nivaro'),
+                ),
+                'default' => 'cover',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                    'coyote_box_producement_mode' => 'option_2',
+                    'coyote_box_option_2_service_id!' => '',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_background_position',
+            array(
+                'label' => __('Background Position', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => array(
+                    'center center' => __('Center Center', 'nivaro'),
+                    'center top' => __('Center Top', 'nivaro'),
+                    'center bottom' => __('Center Bottom', 'nivaro'),
+                    'left top' => __('Left Top', 'nivaro'),
+                    'left center' => __('Left Center', 'nivaro'),
+                    'left bottom' => __('Left Bottom', 'nivaro'),
+                    'right top' => __('Right Top', 'nivaro'),
+                    'right center' => __('Right Center', 'nivaro'),
+                    'right bottom' => __('Right Bottom', 'nivaro'),
+                ),
+                'default' => 'center center',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                    'coyote_box_producement_mode' => 'option_2',
+                    'coyote_box_option_2_service_id!' => '',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_background_repeat',
+            array(
+                'label' => __('Background Repeat', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => array(
+                    'no-repeat' => __('No Repeat', 'nivaro'),
+                    'repeat' => __('Repeat', 'nivaro'),
+                    'repeat-x' => __('Repeat X', 'nivaro'),
+                    'repeat-y' => __('Repeat Y', 'nivaro'),
+                ),
+                'default' => 'no-repeat',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                    'coyote_box_producement_mode' => 'option_2',
+                    'coyote_box_option_2_service_id!' => '',
+                ),
+            )
+        );
+        
         $element->end_controls_section();
         
         // Add Dynamic Content section
@@ -358,11 +423,16 @@ class Nivaro_Coyote_Box_Extension {
         
         // Apply dynamic background only for option 2 and 3
         if (!empty($bg_image_url) && $producement_mode !== 'option_1') {
+            // Get user-selected background settings
+            $bg_size = $settings['coyote_box_background_size'] ?? 'cover';
+            $bg_position = $settings['coyote_box_background_position'] ?? 'center center';
+            $bg_repeat = $settings['coyote_box_background_repeat'] ?? 'no-repeat';
+            
             $element->add_render_attribute('_wrapper', 'style', 
                 'background-image: url(' . esc_url($bg_image_url) . ') !important; ' .
-                'background-position: top left !important; ' .
-                'background-size: cover !important; ' .
-                'background-repeat: no-repeat !important;'
+                'background-position: ' . esc_attr($bg_position) . ' !important; ' .
+                'background-size: ' . esc_attr($bg_size) . ' !important; ' .
+                'background-repeat: ' . esc_attr($bg_repeat) . ' !important;'
             );
         }
         
@@ -484,8 +554,13 @@ class Nivaro_Coyote_Box_Extension {
         <script type="text/javascript">
         jQuery(document).ready(function($) {
             // Function to update container background in editor
-            function updateCoyoteBackground(containerId, serviceId) {
+            function updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat) {
                 if (!serviceId) return;
+                
+                // Set defaults if not provided
+                bgSize = bgSize || 'cover';
+                bgPosition = bgPosition || 'center center';
+                bgRepeat = bgRepeat || 'no-repeat';
                 
                 // AJAX call to get service image URL
                 $.ajax({
@@ -494,6 +569,9 @@ class Nivaro_Coyote_Box_Extension {
                     data: {
                         action: nivaro_coyote_ajax.action,
                         service_id: serviceId,
+                        bg_size: bgSize,
+                        bg_position: bgPosition,
+                        bg_repeat: bgRepeat,
                         nonce: nivaro_coyote_ajax.nonce
                     },
                     success: function(response) {
@@ -505,19 +583,24 @@ class Nivaro_Coyote_Box_Extension {
                             var $container = $(containerSelector);
                             
                             if ($container.length) {
+                                // Get background settings from response
+                                var bgSize = response.data.bg_size || 'cover';
+                                var bgPosition = response.data.bg_position || 'center center';
+                                var bgRepeat = response.data.bg_repeat || 'no-repeat';
+                                
                                 // Apply background image with high specificity
                                 $container.css({
                                     'background-image': 'url(' + imageUrl + ') !important',
-                                    'background-position': 'top left !important',
-                                    'background-size': 'cover !important',
-                                    'background-repeat': 'no-repeat !important'
+                                    'background-position': bgPosition + ' !important',
+                                    'background-size': bgSize + ' !important',
+                                    'background-repeat': bgRepeat + ' !important'
                                 });
                                 
                                 // Also inject as inline style for higher priority
                                 var inlineStyle = 'background-image: url(' + imageUrl + ') !important; ' +
-                                                'background-position: top left !important; ' +
-                                                'background-size: cover !important; ' +
-                                                'background-repeat: no-repeat !important;';
+                                                'background-position: ' + bgPosition + ' !important; ' +
+                                                'background-size: ' + bgSize + ' !important; ' +
+                                                'background-repeat: ' + bgRepeat + ' !important;';
                                 
                                 $container.attr('style', ($container.attr('style') || '') + inlineStyle);
                             }
@@ -536,10 +619,13 @@ class Nivaro_Coyote_Box_Extension {
                             settings.get('coyote_box_producement_mode') === 'option_2') {
                             
                             var serviceId = settings.get('coyote_box_option_2_service_id');
+                            var bgSize = settings.get('coyote_box_background_size');
+                            var bgPosition = settings.get('coyote_box_background_position');
+                            var bgRepeat = settings.get('coyote_box_background_repeat');
                             var containerId = model.get('id');
                             
                             if (serviceId) {
-                                updateCoyoteBackground(containerId, serviceId);
+                                updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat);
                             }
                         }
                     }
@@ -555,11 +641,14 @@ class Nivaro_Coyote_Box_Extension {
                         settings.get('coyote_box_producement_mode') === 'option_2') {
                         
                         var serviceId = settings.get('coyote_box_option_2_service_id');
+                        var bgSize = settings.get('coyote_box_background_size');
+                        var bgPosition = settings.get('coyote_box_background_position');
+                        var bgRepeat = settings.get('coyote_box_background_repeat');
                         var containerId = model.get('id');
                         
                         if (serviceId) {
                             setTimeout(function() {
-                                updateCoyoteBackground(containerId, serviceId);
+                                updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat);
                             }, 100);
                         }
                     }
@@ -580,6 +669,9 @@ class Nivaro_Coyote_Box_Extension {
         }
         
         $service_id = sanitize_text_field($_POST['service_id']);
+        $bg_size = sanitize_text_field($_POST['bg_size'] ?? 'cover');
+        $bg_position = sanitize_text_field($_POST['bg_position'] ?? 'center center');
+        $bg_repeat = sanitize_text_field($_POST['bg_repeat'] ?? 'no-repeat');
         
         if (empty($service_id)) {
             wp_send_json_error('No service ID provided');
@@ -589,7 +681,12 @@ class Nivaro_Coyote_Box_Extension {
         $image_url = $this->database->get_service_image_url($service_id, 'full');
         
         if (!empty($image_url)) {
-            wp_send_json_success(array('image_url' => $image_url));
+            wp_send_json_success(array(
+                'image_url' => $image_url,
+                'bg_size' => $bg_size,
+                'bg_position' => $bg_position,
+                'bg_repeat' => $bg_repeat
+            ));
         } else {
             wp_send_json_error('No image found for service');
         }
