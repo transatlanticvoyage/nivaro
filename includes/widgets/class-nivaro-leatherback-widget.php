@@ -591,14 +591,16 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
         if ($mode === 'auto') {
             $service_id = $settings["service_{$index}_auto_id"] ?? '';
             if ($service_id) {
-                $service = $this->database->get_service_by_id($service_id);
+                $service = $this->database->get_service_with_link($service_id);
                 $image_url = $this->database->get_service_image_url($service_id, 'medium');
                 $title = $service->service_name ?? '';
                 $description = $service->service_placard ?? '';
+                $dynamic_link = $service->dynamic_link ?? '#';
             } else {
                 $image_url = '';
                 $title = "Select Service {$index}";
                 $description = 'Please select a service from the dropdown';
+                $dynamic_link = '#';
             }
         } else {
             // Manual mode
@@ -606,10 +608,14 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
             $image_url = $image_data['url'] ?? '';
             $title = $settings["service_{$index}_manual_title"] ?? "Service Title {$index}";
             $description = $settings["service_{$index}_manual_description"] ?? '';
+            $dynamic_link = null; // Manual mode uses user-defined link
         }
         
         $button_text = $settings["service_{$index}_button_text"] ?? 'Learn More';
         $button_link = $settings["service_{$index}_button_link"] ?? ['url' => '#'];
+        
+        // Use dynamic link for auto mode, manual link for manual mode
+        $final_link = ($mode === 'auto' && $dynamic_link) ? $dynamic_link : $button_link['url'];
         
         ?>
         <div class="leatherback-service-box">
@@ -629,10 +635,10 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
                 <?php endif; ?>
                 
                 <div class="leatherback-service-button">
-                    <a href="<?php echo esc_url($button_link['url']); ?>" 
+                    <a href="<?php echo esc_url($final_link); ?>" 
                        class="leatherback-btn"
-                       <?php echo $button_link['is_external'] ? 'target="_blank"' : ''; ?>
-                       <?php echo $button_link['nofollow'] ? 'rel="nofollow"' : ''; ?>>
+                       <?php echo ($mode === 'manual' && $button_link['is_external']) ? 'target="_blank"' : ''; ?>
+                       <?php echo ($mode === 'manual' && $button_link['nofollow']) ? 'rel="nofollow"' : ''; ?>>
                         <?php echo esc_html($button_text); ?>
                     </a>
                 </div>

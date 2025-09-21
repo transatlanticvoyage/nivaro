@@ -629,7 +629,7 @@ class Nivaro_Coyote_Box_Extension {
      * Render Ocelot services grid for Option 4
      */
     private function render_ocelot_services_grid() {
-        // Get 8 services from database
+        // Get 8 services from database with dynamic links
         $services = $this->database->get_ocelot_services(8);
         
         if (empty($services)) {
@@ -641,6 +641,10 @@ class Nivaro_Coyote_Box_Extension {
         <!-- Ocelot Services Grid -->
         <div class="ocelot-services-grid">
             <?php foreach ($services as $service): ?>
+                <?php 
+                // Get dynamic link for this service
+                $dynamic_link = $this->database->get_service_dynamic_link($service->service_id);
+                ?>
                 <div class="ocelot-service-box">
                     <?php if (!empty($service->rel_image1_id)): ?>
                         <div class="ocelot-service-image">
@@ -658,7 +662,7 @@ class Nivaro_Coyote_Box_Extension {
                         <?php endif; ?>
                         
                         <div class="ocelot-service-button">
-                            <a href="#" class="ocelot-btn">Learn More</a>
+                            <a href="<?php echo esc_url($dynamic_link); ?>" class="ocelot-btn">Learn More</a>
                         </div>
                     </div>
                 </div>
@@ -1033,8 +1037,8 @@ class Nivaro_Coyote_Box_Extension {
             wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
         }
         
-        // Get all services from database
-        $services = $this->database->get_all_services_for_leatherback();
+        // Get all services from database with dynamic links
+        $services = $this->database->get_all_services_with_links();
         $services_count = count($services);
         
         if (empty($services)) {
@@ -1046,19 +1050,20 @@ class Nivaro_Coyote_Box_Extension {
             'box_count' => $services_count
         );
         
-        // Auto-assign service IDs to each box
+        // Auto-assign service IDs to each box with dynamic links
         foreach ($services as $index => $service) {
             $box_number = $index + 1;
             $settings["service_{$box_number}_mode"] = 'auto';
             $settings["service_{$box_number}_auto_id"] = $service->service_id;
             $settings["service_{$box_number}_button_text"] = 'Learn More';
-            $settings["service_{$box_number}_button_link"] = array('url' => '#');
+            // Note: Dynamic links are automatically used in auto mode, no need to set button_link
+            $settings["service_{$box_number}_button_link"] = array('url' => $service->dynamic_link);
         }
         
         wp_send_json_success(array(
             'services_count' => $services_count,
             'settings' => $settings,
-            'message' => sprintf('Successfully configured %d service boxes from database', $services_count)
+            'message' => sprintf('Successfully configured %d service boxes with dynamic links from database', $services_count)
         ));
     }
 }

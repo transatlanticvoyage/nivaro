@@ -239,4 +239,89 @@ class Nivaro_Database {
         
         return intval($count);
     }
+    
+    /**
+     * Get dynamic link for a service by tracing to wp_posts
+     * Returns proper URL based on post status (published/draft)
+     */
+    public function get_service_dynamic_link($service_id) {
+        if (!$service_id || !is_numeric($service_id)) {
+            return '#';
+        }
+        
+        $zen_table = $this->wpdb->prefix . 'zen_services';
+        $posts_table = $this->wpdb->prefix . 'posts';
+        
+        if (!$this->table_exists($zen_table)) {
+            return '#';
+        }
+        
+        // Get the asn_service_page_id from zen_services
+        $page_id = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT asn_service_page_id FROM {$zen_table} WHERE service_id = %d",
+                $service_id
+            )
+        );
+        
+        if (!$page_id) {
+            return '#';
+        }
+        
+        // Get post details from wp_posts
+        $post = $this->wpdb->get_row(
+            $this->wpdb->prepare(
+                "SELECT ID, post_name, post_status, post_type FROM {$posts_table} WHERE ID = %d",
+                $page_id
+            )
+        );
+        
+        if (!$post) {
+            return '#';
+        }
+        
+        // Construct URL based on post status
+        if ($post->post_status === 'publish') {
+            // Published page - use clean URL
+            if ($post->post_type === 'page') {
+                return home_url('/' . $post->post_name . '/');
+            } else {
+                // For posts or custom post types
+                return get_permalink($post->ID);
+            }
+        } else {
+            // Draft/unpublished - use preview URL
+            return home_url('/?page_id=' . $post->ID . '&preview=true');
+        }
+    }
+    
+    /**
+     * Get service data with dynamic link included
+     */
+    public function get_service_with_link($service_id) {
+        $service = $this->get_service_by_id($service_id);
+        
+        if (!$service) {
+            return null;
+        }
+        
+        // Add dynamic link to service object
+        $service->dynamic_link = $this->get_service_dynamic_link($service_id);
+        
+        return $service;
+    }
+    
+    /**
+     * Get all services for Leatherback with dynamic links included
+     */
+    public function get_all_services_with_links() {
+        $services = $this->get_all_services_for_leatherback();
+        
+        // Add dynamic links to each service
+        foreach ($services as $service) {
+            $service->dynamic_link = $this->get_service_dynamic_link($service->service_id);
+        }
+        
+        return $services;
+    }
 }
