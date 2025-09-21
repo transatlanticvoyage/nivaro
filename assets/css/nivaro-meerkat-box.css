@@ -1,0 +1,146 @@
+/**
+ * Nivaro Meerkat Box Widget Styles
+ * Exact replica of the container design
+ */
+
+.meerkat-box-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 350px;
+    padding: 50px 20px;
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-size: cover;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Overlay */
+.meerkat-box-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000000;
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Content wrapper */
+.meerkat-box-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+}
+
+/* Heading styles matching original */
+.meerkat-box-heading {
+    margin: 0;
+    padding: 0;
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    font-size: 64px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -1.928px;
+    text-transform: capitalize;
+    text-align: center;
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .meerkat-box-container {
+        min-height: 300px;
+    }
+    
+    .meerkat-box-heading {
+        font-size: 50px;
+        letter-spacing: -1px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+    .meerkat-box-container {
+        min-height: 250px;
+        background-position: 39% 0;
+    }
+    
+    .meerkat-box-heading {
+        font-size: 38px;
+        line-height: 1.1;
+    }
+}
+
+/* Elementor editor specific */
+.elementor-editor .meerkat-box-container {
+    min-height: 350px;
+}
+
+.elementor-editor .meerkat-box-container:not([style*="background-image"]) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Ensure Google Fonts load */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+/* Handle dynamic content in editor */
+.elementor-widget-nivaro-meerkat-box .elementor-widget-container {
+    overflow: visible;
+}
+
+/* Animation on hover (optional enhancement) */
+.meerkat-box-container {
+    transition: transform 0.3s ease;
+}
+
+.meerkat-box-container:hover {
+    transform: scale(1.01);
+}
+
+/* Ensure text remains crisp */
+.meerkat-box-heading {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Fix for container flex issues */
+.meerkat-box-container > * {
+    flex-shrink: 0;
+}
+
+/* Additional helper classes */
+.meerkat-box-container.meerkat-has-service {
+    /* When a service is selected */
+}
+
+.meerkat-box-container.meerkat-no-image {
+    background-color: #f0f0f0;
+}
+
+/* Loading state */
+.meerkat-box-container.meerkat-loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: meerkat-spin 1s linear infinite;
+    z-index: 3;
+}
+
+@keyframes meerkat-spin {
+    to { transform: rotate(360deg); }
+}

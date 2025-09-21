@@ -56,13 +56,18 @@ class Nivaro {
     }
     
     public function elementor_init() {
-        // Load widget file
+        // Load widget files
         $widget_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-zen-service-widget.php';
         if (file_exists($widget_file)) {
             require_once $widget_file;
         }
         
-        // Register widget
+        $meerkat_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-meerkat-box-widget.php';
+        if (file_exists($meerkat_file)) {
+            require_once $meerkat_file;
+        }
+        
+        // Register widgets
         add_action('elementor/widgets/register', array($this, 'register_widgets'), 10, 1);
         
         // Enqueue editor styles
@@ -70,21 +75,40 @@ class Nivaro {
     }
     
     public function register_widgets($widgets_manager) {
-        // Only register if class exists
+        // Register Zen Service Widget
         if (class_exists('Nivaro_Zen_Service_Widget')) {
             try {
                 $widgets_manager->register(new Nivaro_Zen_Service_Widget());
             } catch (Exception $e) {
-                error_log('Nivaro: Failed to register widget - ' . $e->getMessage());
+                error_log('Nivaro: Failed to register Zen Service widget - ' . $e->getMessage());
+            }
+        }
+        
+        // Register Meerkat Box Widget
+        if (class_exists('Nivaro_Meerkat_Box_Widget')) {
+            try {
+                $widgets_manager->register(new Nivaro_Meerkat_Box_Widget());
+            } catch (Exception $e) {
+                error_log('Nivaro: Failed to register Meerkat Box widget - ' . $e->getMessage());
             }
         }
     }
     
     public function enqueue_assets() {
+        // Enqueue original widget styles
         $css_file = NIVARO_PLUGIN_URL . 'assets/css/nivaro-widget.css';
         wp_enqueue_style(
             'nivaro-widget',
             $css_file,
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+        
+        // Enqueue Meerkat Box styles
+        $meerkat_css = NIVARO_PLUGIN_URL . 'assets/css/nivaro-meerkat-box.css';
+        wp_enqueue_style(
+            'nivaro-meerkat-box',
+            $meerkat_css,
             array(),
             NIVARO_PLUGIN_VERSION
         );
