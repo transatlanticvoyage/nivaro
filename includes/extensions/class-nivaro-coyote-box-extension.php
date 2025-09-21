@@ -225,6 +225,44 @@ class Nivaro_Coyote_Box_Extension {
             )
         );
         
+        $element->add_control(
+            'coyote_box_wombat_note',
+            array(
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '
+                    <div style="background: #f0f8ff; border: 1px solid #0073aa; padding: 12px; border-radius: 4px; margin-top: 10px;">
+                        <div style="margin-bottom: 8px;">
+                            <strong>Wombat System</strong><br>
+                            <strong>Note on how logic works to draw a relationship:</strong>
+                        </div>
+                        <div class="wombat-logic-text" style="font-size: 12px; line-height: 1.6; color: #555;">
+                            The system automatically retrieves the current page/post ID, then searches the wp_zen_services database table for a matching row where asn_service_page_id equals this ID. When found, it extracts the rel_image1_id value from that row, which references a WordPress media attachment. This attachment\'s image URL is then used as the container\'s background image. This creates an automatic page-to-service-to-image relationship without manual selection.
+                        </div>
+                        <button 
+                            type="button" 
+                            onclick="
+                                var text = this.parentElement.querySelector(\'.wombat-logic-text\').innerText;
+                                var tempInput = document.createElement(\'textarea\');
+                                tempInput.value = text;
+                                document.body.appendChild(tempInput);
+                                tempInput.select();
+                                document.execCommand(\'copy\');
+                                document.body.removeChild(tempInput);
+                                var btn = this;
+                                btn.innerText = \'Copied!\';
+                                setTimeout(function() { btn.innerText = \'Copy to Clipboard\'; }, 2000);
+                            "
+                            style="margin-top: 10px; padding: 6px 12px; background: #0073aa; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                            Copy to Clipboard
+                        </button>
+                    </div>',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                    'coyote_box_producement_mode' => 'option_3',
+                ),
+            )
+        );
+        
         $element->end_controls_section();
         
         // Add Dynamic Content section
