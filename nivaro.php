@@ -45,7 +45,7 @@ class Nivaro {
         $this->load_dependencies();
         
         // Initialize Elementor widgets
-        add_action('elementor/widgets/widgets_registered', array($this, 'register_widgets'));
+        add_action('elementor/widgets/register', array($this, 'register_widgets'));
         
         // Enqueue assets
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
@@ -57,8 +57,8 @@ class Nivaro {
         require_once NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-zen-service-widget.php';
     }
     
-    public function register_widgets() {
-        \Elementor\Plugin::instance()->widgets_manager->register_widget_type(new \Nivaro_Zen_Service_Widget());
+    public function register_widgets($widgets_manager) {
+        $widgets_manager->register(new \Nivaro_Zen_Service_Widget());
     }
     
     public function enqueue_assets() {

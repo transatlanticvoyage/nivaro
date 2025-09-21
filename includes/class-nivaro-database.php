@@ -123,17 +123,22 @@ class Nivaro_Database {
      * Get service options for Elementor dropdown
      */
     public function get_service_options() {
-        $services = $this->get_all_services();
-        $options = array('' => __('Select a service...', 'nivaro'));
-        
-        foreach ($services as $service) {
-            $label = $service->service_name;
-            if (!empty($service->service_placard)) {
-                $label .= ' (' . $service->service_placard . ')';
+        try {
+            $services = $this->get_all_services();
+            $options = array('' => __('Select a service...', 'nivaro'));
+            
+            foreach ($services as $service) {
+                $label = $service->service_name;
+                if (!empty($service->service_placard)) {
+                    $label .= ' (' . $service->service_placard . ')';
+                }
+                $options[$service->service_id] = $label;
             }
-            $options[$service->service_id] = $label;
+            
+            return $options;
+        } catch (Exception $e) {
+            // Return default options if database error
+            return array('' => __('Database error - check zen_services table', 'nivaro'));
         }
-        
-        return $options;
     }
 }
