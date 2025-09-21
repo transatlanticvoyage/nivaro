@@ -74,16 +74,18 @@
             var settings = model.get('settings');
             
             if (settings.get('coyote_box_enable') === 'yes' && 
-                settings.get('coyote_box_producement_mode') === 'option_2') {
+                (settings.get('coyote_box_producement_mode') === 'option_2' || 
+                 settings.get('coyote_box_producement_mode') === 'option_3')) {
                 
                 var serviceId = settings.get('coyote_box_option_2_service_id');
                 var bgSize = settings.get('coyote_box_background_size');
                 var bgPosition = settings.get('coyote_box_background_position');
                 var bgRepeat = settings.get('coyote_box_background_repeat');
                 var containerId = model.get('id');
+                var mode = settings.get('coyote_box_producement_mode');
                 
-                if (serviceId) {
-                    this.updateBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat);
+                if ((mode === 'option_2' && serviceId) || mode === 'option_3') {
+                    this.updateBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode);
                 } else {
                     this.clearBackground(containerId);
                 }
@@ -93,21 +95,27 @@
         /**
          * Update container background with service image
          */
-        updateBackground: function(containerId, serviceId, bgSize, bgPosition, bgRepeat) {
+        updateBackground: function(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode) {
             // Set defaults
             bgSize = bgSize || 'cover';
             bgPosition = bgPosition || 'center center';
             bgRepeat = bgRepeat || 'no-repeat';
+            mode = mode || 'option_2';
+            
+            // Get current post ID for Option 3 (Wombat System)
+            var postId = this.getCurrentPostId();
             
             $.ajax({
                 url: nivaro_coyote_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: nivaro_coyote_ajax.action,
-                    service_id: serviceId,
+                    service_id: serviceId || '',
                     bg_size: bgSize,
                     bg_position: bgPosition,
                     bg_repeat: bgRepeat,
+                    mode: mode,
+                    editor_post_id: postId,
                     nonce: nivaro_coyote_ajax.nonce
                 },
                 success: function(response) {
@@ -204,6 +212,43 @@
                     }
                 }.bind(this));
             }
+        },
+        
+        /**
+         * Get current post ID from Elementor editor context
+         */
+        getCurrentPostId: function() {
+            var postId = null;
+            
+            // Try to get from Elementor config
+            if (typeof elementorFrontendConfig !== 'undefined' && elementorFrontendConfig.post) {
+                postId = elementorFrontendConfig.post.id;
+            }
+            
+            // Try to get from Elementor settings
+            if (!postId && typeof elementor !== 'undefined' && elementor.settings && elementor.settings.page) {
+                postId = elementor.settings.page.model.get('post_id');
+            }
+            
+            // Try to get from URL parameters
+            if (!postId) {
+                var urlParams = new URLSearchParams(window.location.search);
+                postId = urlParams.get('post') || urlParams.get('page_id');
+            }
+            
+            // Try to get from global WordPress variables
+            if (!postId && typeof wp !== 'undefined' && wp.data) {
+                try {
+                    var currentPost = wp.data.select('core/editor').getCurrentPost();
+                    if (currentPost) {
+                        postId = currentPost.id;
+                    }
+                } catch (e) {
+                    // Ignore if core/editor is not available
+                }
+            }
+            
+            return postId ? parseInt(postId) : null;
         }
     };
     

@@ -135,7 +135,7 @@ class Nivaro_Coyote_Box_Extension {
                 'options' => array(
                     'option_1' => __('Option 1 - default/fallback', 'nivaro'),
                     'option_2' => __('Option 2 - Dynamic System', 'nivaro'),
-                    'option_3' => __('Option 3 - Dynamic System', 'nivaro'),
+                    'option_3' => __('Option 3 - Derive From Wombat System', 'nivaro'),
                 ),
                 'default' => 'option_1',
                 'condition' => array(
@@ -416,8 +416,11 @@ class Nivaro_Coyote_Box_Extension {
                 break;
                 
             case 'option_3':
-                // Placeholder for option 3 functionality
-                // Will implement when you specify requirements
+                // Use Wombat System - derive from current page ID
+                $current_post_id = get_the_ID();
+                if ($current_post_id) {
+                    $bg_image_url = $this->database->get_wombat_image_url($current_post_id, 'full');
+                }
                 break;
         }
         
@@ -554,8 +557,8 @@ class Nivaro_Coyote_Box_Extension {
         <script type="text/javascript">
         jQuery(document).ready(function($) {
             // Function to update container background in editor
-            function updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat) {
-                if (!serviceId) return;
+            function updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode) {
+                if (mode === 'option_2' && !serviceId) return;
                 
                 // Set defaults if not provided
                 bgSize = bgSize || 'cover';
@@ -568,10 +571,11 @@ class Nivaro_Coyote_Box_Extension {
                     type: 'POST',
                     data: {
                         action: nivaro_coyote_ajax.action,
-                        service_id: serviceId,
+                        service_id: serviceId || '',
                         bg_size: bgSize,
                         bg_position: bgPosition,
                         bg_repeat: bgRepeat,
+                        mode: mode || 'option_2',
                         nonce: nivaro_coyote_ajax.nonce
                     },
                     success: function(response) {
@@ -616,16 +620,18 @@ class Nivaro_Coyote_Box_Extension {
                     if (model.get('elType') === 'container') {
                         var settings = model.get('settings');
                         if (settings.get('coyote_box_enable') === 'yes' && 
-                            settings.get('coyote_box_producement_mode') === 'option_2') {
+                            (settings.get('coyote_box_producement_mode') === 'option_2' || 
+                             settings.get('coyote_box_producement_mode') === 'option_3')) {
                             
                             var serviceId = settings.get('coyote_box_option_2_service_id');
                             var bgSize = settings.get('coyote_box_background_size');
                             var bgPosition = settings.get('coyote_box_background_position');
                             var bgRepeat = settings.get('coyote_box_background_repeat');
                             var containerId = model.get('id');
+                            var mode = settings.get('coyote_box_producement_mode');
                             
-                            if (serviceId) {
-                                updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat);
+                            if ((mode === 'option_2' && serviceId) || mode === 'option_3') {
+                                updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode);
                             }
                         }
                     }
@@ -638,17 +644,19 @@ class Nivaro_Coyote_Box_Extension {
                     
                     if (model.get('elType') === 'container' && 
                         settings.get('coyote_box_enable') === 'yes' &&
-                        settings.get('coyote_box_producement_mode') === 'option_2') {
+                        (settings.get('coyote_box_producement_mode') === 'option_2' || 
+                         settings.get('coyote_box_producement_mode') === 'option_3')) {
                         
                         var serviceId = settings.get('coyote_box_option_2_service_id');
                         var bgSize = settings.get('coyote_box_background_size');
                         var bgPosition = settings.get('coyote_box_background_position');
                         var bgRepeat = settings.get('coyote_box_background_repeat');
                         var containerId = model.get('id');
+                        var mode = settings.get('coyote_box_producement_mode');
                         
-                        if (serviceId) {
+                        if ((mode === 'option_2' && serviceId) || mode === 'option_3') {
                             setTimeout(function() {
-                                updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat);
+                                updateCoyoteBackground(containerId, serviceId, bgSize, bgPosition, bgRepeat, mode);
                             }, 100);
                         }
                     }
@@ -668,27 +676,48 @@ class Nivaro_Coyote_Box_Extension {
             wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
         }
         
-        $service_id = sanitize_text_field($_POST['service_id']);
+        $service_id = sanitize_text_field($_POST['service_id'] ?? '');
         $bg_size = sanitize_text_field($_POST['bg_size'] ?? 'cover');
         $bg_position = sanitize_text_field($_POST['bg_position'] ?? 'center center');
         $bg_repeat = sanitize_text_field($_POST['bg_repeat'] ?? 'no-repeat');
+        $mode = sanitize_text_field($_POST['mode'] ?? 'option_2');
         
-        if (empty($service_id)) {
-            wp_send_json_error('No service ID provided');
+        $image_url = '';
+        
+        if ($mode === 'option_3') {
+            // Use Wombat System - get current post ID
+            // In editor context, we need to get the post ID from the current page being edited
+            $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : get_the_ID();
+            if (!$post_id && isset($_GET['post'])) {
+                $post_id = intval($_GET['post']);
+            }
+            if (!$post_id && isset($_POST['editor_post_id'])) {
+                $post_id = intval($_POST['editor_post_id']);
+            }
+            
+            if ($post_id) {
+                $image_url = $this->database->get_wombat_image_url($post_id, 'full');
+            }
+        } elseif ($mode === 'option_2') {
+            // Use Option 2 - service selection
+            if (empty($service_id)) {
+                wp_send_json_error('No service ID provided for Option 2');
+            }
+            
+            // Get image URL using existing database method
+            $image_url = $this->database->get_service_image_url($service_id, 'full');
         }
-        
-        // Get image URL using existing database method
-        $image_url = $this->database->get_service_image_url($service_id, 'full');
         
         if (!empty($image_url)) {
             wp_send_json_success(array(
                 'image_url' => $image_url,
                 'bg_size' => $bg_size,
                 'bg_position' => $bg_position,
-                'bg_repeat' => $bg_repeat
+                'bg_repeat' => $bg_repeat,
+                'mode' => $mode
             ));
         } else {
-            wp_send_json_error('No image found for service');
+            wp_send_json_error('No image found for ' . ($mode === 'option_3' ? 'current page in Wombat System' : 'selected service'));
         }
     }
 }

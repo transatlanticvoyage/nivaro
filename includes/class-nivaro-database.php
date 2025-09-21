@@ -141,4 +141,37 @@ class Nivaro_Database {
             return array('' => __('Database error - check zen_services table', 'nivaro'));
         }
     }
+    
+    /**
+     * Get service image URL by page ID using Wombat System
+     * Looks up service by asn_service_page_id matching current post ID
+     */
+    public function get_wombat_image_url($post_id, $size = 'full') {
+        if (!$post_id || !is_numeric($post_id)) {
+            return '';
+        }
+        
+        $table_name = $this->wpdb->prefix . 'zen_services';
+        
+        if (!$this->table_exists($table_name)) {
+            return '';
+        }
+        
+        // Find service row where asn_service_page_id matches the post ID
+        $service = $this->wpdb->get_row(
+            $this->wpdb->prepare(
+                "SELECT rel_image1_id FROM {$table_name} WHERE asn_service_page_id = %d LIMIT 1",
+                $post_id
+            )
+        );
+        
+        if (!$service || !$service->rel_image1_id) {
+            return '';
+        }
+        
+        // Get WordPress attachment URL
+        $image_url = wp_get_attachment_image_url($service->rel_image1_id, $size);
+        
+        return $image_url ? $image_url : '';
+    }
 }
