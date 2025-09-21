@@ -1,0 +1,193 @@
+/**
+ * Nivaro Coyote Box Container Extension Styles
+ */
+
+/* Base container styles when Coyote Box is enabled */
+.coyote-box-container {
+    position: relative !important;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-repeat: no-repeat;
+}
+
+/* Preserve original container settings */
+.coyote-box-container.elementor-container {
+    /* These inherit from Elementor's container settings */
+}
+
+/* Overlay styles */
+.coyote-box-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Heading wrapper */
+.coyote-box-heading-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 0;
+}
+
+/* Heading styles matching original */
+.coyote-box-heading {
+    margin: 0;
+    padding: 0;
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    font-size: 64px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -1.928px;
+    text-transform: capitalize;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure content is above overlay */
+.coyote-box-container > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .coyote-box-container {
+        min-height: 300px;
+    }
+    
+    .coyote-box-heading {
+        font-size: 50px;
+        letter-spacing: -1px;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+    .coyote-box-container {
+        min-height: 250px;
+    }
+    
+    .coyote-box-heading {
+        font-size: 38px;
+        line-height: 1.1;
+    }
+    
+    /* Mobile background position adjustment */
+    .coyote-box-container[style*="background-position: top left"] {
+        background-position: 39% 0 !important;
+    }
+}
+
+/* Elementor editor specific */
+.elementor-editor .coyote-box-container {
+    min-height: 350px;
+}
+
+/* Visual indicator in editor when enabled */
+.elementor-editor .coyote-box-container[data-coyote-box="enabled"]:not([style*="background-image"]) {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    position: relative;
+}
+
+.elementor-editor .coyote-box-container[data-coyote-box="enabled"]:not([style*="background-image"])::after {
+    content: "Coyote Box: No background image";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+/* Fix z-index stacking */
+.coyote-box-container.elementor-element {
+    isolation: isolate;
+}
+
+/* Loading state */
+.coyote-box-container.coyote-loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: coyote-spin 1s linear infinite;
+    z-index: 10;
+}
+
+@keyframes coyote-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Service-specific helper classes */
+.coyote-box-service-1 {
+    /* Custom styles for service ID 1 */
+}
+
+.coyote-box-service-2 {
+    /* Custom styles for service ID 2 */
+}
+
+/* Ensure proper stacking with container's own content */
+.coyote-box-container > .elementor-container-inner,
+.coyote-box-container > .elementor-widget-wrap {
+    position: relative;
+    z-index: 2;
+}
+
+/* Fix for nested containers */
+.coyote-box-container .elementor-element {
+    position: relative;
+    z-index: 2;
+}
+
+/* Transition effects */
+.coyote-box-container {
+    transition: background-image 0.3s ease;
+}
+
+/* Optional hover effect */
+.coyote-box-container:hover {
+    transform: none; /* Disable transform to not interfere with container settings */
+}
+
+/* Debug mode for development */
+body.coyote-debug .coyote-box-container {
+    border: 2px dashed #ff6b6b;
+}
+
+body.coyote-debug .coyote-box-container::before {
+    content: "Coyote Box Active";
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #ff6b6b;
+    color: white;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-family: monospace;
+    z-index: 1000;
+    pointer-events: none;
+}

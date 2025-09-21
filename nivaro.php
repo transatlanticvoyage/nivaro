@@ -67,6 +67,13 @@ class Nivaro {
             require_once $meerkat_file;
         }
         
+        // Load container extensions
+        $coyote_file = NIVARO_PLUGIN_PATH . 'includes/extensions/class-nivaro-coyote-box-extension.php';
+        if (file_exists($coyote_file)) {
+            require_once $coyote_file;
+            new Nivaro_Coyote_Box_Extension();
+        }
+        
         // Register widgets
         add_action('elementor/widgets/register', array($this, 'register_widgets'), 10, 1);
         
