@@ -33,17 +33,14 @@
 
 /* Inner wrapper to contain all elements */
 .coyote-box-inner-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: relative;
     width: 100%;
-    height: 100%;
+    min-height: inherit; /* Inherit from parent container */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 0;
 }
 
 /* Overlay with exact opacity */
@@ -57,6 +54,19 @@
     opacity: 0.7;
     pointer-events: none;
     z-index: 1;
+}
+
+/* Ensure overlay covers the entire container when using relative wrapper */
+.coyote-box-container {
+    position: relative;
+}
+
+.coyote-box-container .coyote-box-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 /* Content container */
