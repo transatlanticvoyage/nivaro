@@ -48,6 +48,10 @@ class Nivaro_Coyote_Box_Extension {
         add_action('wp_ajax_nivaro_leatherback_auto_generate', array($this, 'ajax_leatherback_auto_generate'));
         add_action('wp_ajax_nopriv_nivaro_leatherback_auto_generate', array($this, 'ajax_leatherback_auto_generate'));
         
+        // AJAX handlers for Gecko auto-generation
+        add_action('wp_ajax_nivaro_gecko_auto_generate', array($this, 'ajax_gecko_auto_generate'));
+        add_action('wp_ajax_nopriv_nivaro_gecko_auto_generate', array($this, 'ajax_gecko_auto_generate'));
+        
         // Debug AJAX handler
         add_action('wp_ajax_nivaro_debug_links', array($this, 'ajax_debug_links'));
         add_action('wp_ajax_nopriv_nivaro_debug_links', array($this, 'ajax_debug_links'));
@@ -150,6 +154,7 @@ class Nivaro_Coyote_Box_Extension {
                     'option_3' => __('Option 3 - Derive From Wombat System', 'nivaro'),
                     'option_4' => __('Option 4 - Ocelot Setup', 'nivaro'),
                     'option_5' => __('Option 5 - Armadillo Setup', 'nivaro'),
+                    'option_6' => __('Option 6 - Gecko Setup', 'nivaro'),
                 ),
                 'default' => 'option_1',
                 'condition' => array(
@@ -324,6 +329,33 @@ class Nivaro_Coyote_Box_Extension {
                 'condition' => array(
                     'coyote_box_enable' => 'yes',
                     'coyote_box_producement_mode' => 'option_5',
+                ),
+            )
+        );
+        
+        $element->add_control(
+            'coyote_box_gecko_note',
+            array(
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '
+                    <div style="background: #f0f8ff; border: 1px solid #4169e1; padding: 12px; border-radius: 4px; margin-top: 10px;">
+                        <div style="margin-bottom: 8px;">
+                            <strong>🦎 Gecko Setup</strong><br>
+                            <strong>Alternative styling approach for service boxes:</strong>
+                        </div>
+                        <div style="font-size: 12px; line-height: 1.6; color: #555; margin-bottom: 8px;">
+                            This mode prepares the container for use with the companion <strong>Gecko Widget</strong>. Add the Gecko widget manually to this container for a grid of 8 service boxes with alternative styling that matches specific design requirements.
+                        </div>
+                        <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
+                            <strong>Workflow:</strong> Enable Gecko → Add Gecko Widget → Customize each service box individually
+                        </div>
+                        <div style="font-size: 11px; background: #e6f0ff; padding: 6px; border-radius: 3px;">
+                            <strong>💡 Tip:</strong> Use this when you need service boxes with specific styling different from the standard Leatherback appearance
+                        </div>
+                    </div>',
+                'condition' => array(
+                    'coyote_box_enable' => 'yes',
+                    'coyote_box_producement_mode' => 'option_6',
                 ),
             )
         );
@@ -535,6 +567,11 @@ class Nivaro_Coyote_Box_Extension {
                 // Armadillo Setup - prepare container for manual Leatherback widget insertion
                 // No auto-population, user will manually add Leatherback widget to container
                 break;
+                
+            case 'option_6':
+                // Gecko Setup - prepare container for manual Gecko widget insertion
+                // No auto-population, user will manually add Gecko widget to container
+                break;
         }
         
         // Apply dynamic background only for option 2 and 3
@@ -715,6 +752,14 @@ class Nivaro_Coyote_Box_Extension {
             true
         );
         
+        wp_enqueue_script(
+            'nivaro-gecko-editor',
+            NIVARO_PLUGIN_URL . 'assets/js/nivaro-gecko-editor.js',
+            array('jquery', 'elementor-editor'),
+            NIVARO_PLUGIN_VERSION,
+            true
+        );
+        
         // Localize script with AJAX data
         wp_localize_script('nivaro-coyote-editor', 'nivaro_coyote_ajax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
@@ -724,6 +769,13 @@ class Nivaro_Coyote_Box_Extension {
         
         // Localize Leatherback script with same AJAX data
         wp_localize_script('nivaro-leatherback-editor', 'nivaro_coyote_ajax', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('nivaro_coyote_nonce'),
+            'action' => 'nivaro_get_service_image'
+        ));
+        
+        // Localize Gecko script with same AJAX data
+        wp_localize_script('nivaro-gecko-editor', 'nivaro_coyote_ajax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('nivaro_coyote_nonce'),
             'action' => 'nivaro_get_service_image'
@@ -1073,6 +1125,58 @@ class Nivaro_Coyote_Box_Extension {
             'settings' => $settings,
             'message' => sprintf('Successfully configured %d service boxes with dynamic links from database', $services_count)
         ));
+    }
+    
+    /**
+     * AJAX handler for Gecko auto-generation
+     */
+    public function ajax_gecko_auto_generate() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_coyote_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        // Get quantity from request, default to 8
+        $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 8;
+        $quantity = max(1, min(8, $quantity)); // Ensure between 1-8
+        
+        // Get all services from database with Gecko-specific fields
+        $services = $this->database->get_all_services_for_gecko();
+        $services_count = count($services);
+        
+        if (empty($services)) {
+            wp_send_json_error('No services found in database');
+        }
+        
+        // Prepare response data for Gecko widget
+        $response_services = array();
+        
+        // Convert up to requested quantity for Gecko widget format
+        foreach (array_slice($services, 0, $quantity) as $service) {
+            // Generate WordPress page URL from asn_service_page_id
+            $page_url = '';
+            if (!empty($service->asn_service_page_id)) {
+                $page_url = get_permalink($service->asn_service_page_id);
+            }
+            
+            // Get image URL from rel_image1_id
+            $image_url = '';
+            $image_id = '';
+            if (!empty($service->rel_image1_id)) {
+                $image_url = wp_get_attachment_url($service->rel_image1_id);
+                $image_id = $service->rel_image1_id;
+            }
+            
+            $response_services[] = array(
+                'title' => $service->service_name,
+                'description' => $service->description1_short ?? '',
+                'link' => $page_url,
+                'image_url' => $image_url,
+                'image_id' => $image_id
+            );
+        }
+        
+        wp_send_json_success($response_services);
     }
     
     /**

@@ -224,6 +224,27 @@ class Nivaro_Database {
     }
     
     /**
+     * Get all services for Gecko widget with specific fields
+     * Returns: service_id, service_name, description1_short, rel_image1_id, asn_service_page_id
+     */
+    public function get_all_services_for_gecko() {
+        $table_name = $this->wpdb->prefix . 'zen_services';
+        
+        if (!$this->table_exists($table_name)) {
+            return array();
+        }
+        
+        $results = $this->wpdb->get_results(
+            "SELECT service_id, service_name, description1_short, rel_image1_id, asn_service_page_id 
+             FROM {$table_name} 
+             WHERE service_name IS NOT NULL 
+             ORDER BY service_name ASC"
+        );
+        
+        return $results ? $results : array();
+    }
+    
+    /**
      * Get count of all services in database
      */
     public function get_services_count() {

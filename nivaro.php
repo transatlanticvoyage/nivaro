@@ -22,6 +22,7 @@ define('NIVARO_PLUGIN_URL', plugin_dir_url(__FILE__));
 class Nivaro {
     
     private static $instance = null;
+    public $database = null;
     
     public static function get_instance() {
         if (null === self::$instance) {
@@ -39,13 +40,25 @@ class Nivaro {
         // Basic database functionality always loads
         $this->load_database_handler();
         
+        // Initialize database instance
+        if (class_exists('Nivaro_Database')) {
+            $this->database = new Nivaro_Database();
+        }
+        
+        // Register AJAX handlers for widgets
+        $this->register_ajax_handlers();
+        
         // Only load Elementor features if Elementor is active
         if ($this->is_elementor_active()) {
             add_action('elementor/init', array($this, 'elementor_init'));
         }
         
-        // Enqueue frontend styles
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
+        // Enqueue frontend styles conditionally
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+        
+        // Enqueue editor styles and scripts
+        add_action('elementor/editor/after_enqueue_scripts', array($this, 'enqueue_editor_assets'));
+        add_action('elementor/editor/after_enqueue_styles', array($this, 'enqueue_editor_styles'));
     }
     
     private function load_database_handler() {
@@ -53,6 +66,19 @@ class Nivaro {
         if (file_exists($db_file)) {
             require_once $db_file;
         }
+    }
+    
+    /**
+     * Register AJAX handlers for independent widget operation
+     */
+    private function register_ajax_handlers() {
+        // Leatherback auto-generation
+        add_action('wp_ajax_nivaro_leatherback_auto_generate', array($this, 'ajax_leatherback_auto_generate'));
+        add_action('wp_ajax_nopriv_nivaro_leatherback_auto_generate', array($this, 'ajax_leatherback_auto_generate'));
+        
+        // Gecko auto-generation
+        add_action('wp_ajax_nivaro_gecko_auto_generate', array($this, 'ajax_gecko_auto_generate'));
+        add_action('wp_ajax_nopriv_nivaro_gecko_auto_generate', array($this, 'ajax_gecko_auto_generate'));
     }
     
     public function elementor_init() {
@@ -80,6 +106,11 @@ class Nivaro {
         $leatherback_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-leatherback-widget.php';
         if (file_exists($leatherback_file)) {
             require_once $leatherback_file;
+        }
+        
+        $gecko_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-gecko-widget.php';
+        if (file_exists($gecko_file)) {
+            require_once $gecko_file;
         }
         
         // Load container extensions
@@ -141,6 +172,142 @@ class Nivaro {
                 error_log('Nivaro: Failed to register Leatherback widget - ' . $e->getMessage());
             }
         }
+        
+        // Register Gecko Widget
+        if (class_exists('Nivaro_Gecko_Widget')) {
+            try {
+                $widgets_manager->register(new Nivaro_Gecko_Widget());
+            } catch (Exception $e) {
+                error_log('Nivaro: Failed to register Gecko widget - ' . $e->getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Check if page has Nivaro widgets
+     */
+    private function page_has_nivaro_widgets() {
+        if (!class_exists('\Elementor\Plugin')) {
+            return false;
+        }
+        
+        $post_id = get_the_ID();
+        if (!$post_id) {
+            return false;
+        }
+        
+        $document = \Elementor\Plugin::$instance->documents->get($post_id);
+        if (!$document) {
+            return false;
+        }
+        
+        $elements = $document->get_elements_data();
+        
+        // Check recursively for our widgets
+        return $this->search_for_widgets($elements);
+    }
+    
+    /**
+     * Recursively search for Nivaro widgets in Elementor data
+     */
+    private function search_for_widgets($elements) {
+        if (!is_array($elements)) {
+            return false;
+        }
+        
+        $nivaro_widgets = array('nivaro-leatherback', 'nivaro-gecko', 'nivaro-ocelot-service');
+        
+        foreach ($elements as $element) {
+            if (isset($element['widgetType']) && in_array($element['widgetType'], $nivaro_widgets)) {
+                return true;
+            }
+            
+            if (!empty($element['elements'])) {
+                if ($this->search_for_widgets($element['elements'])) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Enqueue frontend assets conditionally
+     */
+    public function enqueue_frontend_assets() {
+        // Check if page has our widgets before loading assets
+        if (!$this->page_has_nivaro_widgets()) {
+            return;
+        }
+        
+        // Enqueue Leatherback styles
+        wp_enqueue_style(
+            'nivaro-leatherback',
+            NIVARO_PLUGIN_URL . 'assets/css/nivaro-leatherback.css',
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+        
+        // Enqueue Gecko styles
+        wp_enqueue_style(
+            'nivaro-gecko',
+            NIVARO_PLUGIN_URL . 'assets/css/nivaro-gecko.css',
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+    }
+    
+    /**
+     * Enqueue editor scripts for widget functionality
+     */
+    public function enqueue_editor_assets() {
+        // Enqueue Leatherback editor script
+        wp_enqueue_script(
+            'nivaro-leatherback-editor',
+            NIVARO_PLUGIN_URL . 'assets/js/nivaro-leatherback-editor.js',
+            array('jquery', 'elementor-editor'),
+            NIVARO_PLUGIN_VERSION,
+            true
+        );
+        
+        // Enqueue Gecko editor script
+        wp_enqueue_script(
+            'nivaro-gecko-editor',
+            NIVARO_PLUGIN_URL . 'assets/js/nivaro-gecko-editor.js',
+            array('jquery', 'elementor-editor'),
+            NIVARO_PLUGIN_VERSION,
+            true
+        );
+        
+        // Localize scripts with AJAX data
+        $ajax_data = array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('nivaro_widget_nonce')
+        );
+        
+        wp_localize_script('nivaro-leatherback-editor', 'nivaro_widget_ajax', $ajax_data);
+        wp_localize_script('nivaro-gecko-editor', 'nivaro_widget_ajax', $ajax_data);
+    }
+    
+    /**
+     * Enqueue editor styles
+     */
+    public function enqueue_editor_styles() {
+        // Enqueue widget styles in editor
+        wp_enqueue_style(
+            'nivaro-leatherback',
+            NIVARO_PLUGIN_URL . 'assets/css/nivaro-leatherback.css',
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+        
+        wp_enqueue_style(
+            'nivaro-gecko',
+            NIVARO_PLUGIN_URL . 'assets/css/nivaro-gecko.css',
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
     }
     
     public function enqueue_assets() {
@@ -188,11 +355,118 @@ class Nivaro {
             array(),
             NIVARO_PLUGIN_VERSION
         );
+        
+        // Enqueue Gecko styles
+        $gecko_css = NIVARO_PLUGIN_URL . 'assets/css/nivaro-gecko.css';
+        wp_enqueue_style(
+            'nivaro-gecko',
+            $gecko_css,
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
     }
     
     private function is_elementor_active() {
         // Check if Elementor is loaded
         return did_action('elementor/loaded');
+    }
+    
+    /**
+     * AJAX handler for Leatherback auto-generation
+     * Moved from Coyote Extension for independent operation
+     */
+    public function ajax_leatherback_auto_generate() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_widget_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        // Get all services from database with dynamic links
+        $services = $this->database->get_all_services_with_links();
+        $services_count = count($services);
+        
+        if (empty($services)) {
+            wp_send_json_error('No services found in database');
+        }
+        
+        // Prepare settings array for auto-generation (cap at 20 for performance)
+        $effective_count = min($services_count, 20);
+        $settings = array(
+            'box_count' => $effective_count
+        );
+        
+        // Auto-assign service IDs to each box with dynamic links (up to effective count)
+        foreach (array_slice($services, 0, $effective_count) as $index => $service) {
+            $box_number = $index + 1;
+            $settings["service_{$box_number}_mode"] = 'auto';
+            $settings["service_{$box_number}_auto_id"] = $service->service_id;
+            $settings["service_{$box_number}_button_text"] = 'Learn More';
+            // Set the button link field to show the dynamic link in the controls
+            $settings["service_{$box_number}_button_link"] = array(
+                'url' => $service->dynamic_link,
+                'is_external' => false,
+                'nofollow' => false
+            );
+        }
+        
+        wp_send_json_success(array(
+            'services_count' => $effective_count,
+            'settings' => $settings,
+            'message' => sprintf('Successfully configured %d service boxes with dynamic links from database', $effective_count)
+        ));
+    }
+    
+    /**
+     * AJAX handler for Gecko auto-generation
+     * Moved from Coyote Extension for independent operation
+     */
+    public function ajax_gecko_auto_generate() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_widget_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        // Get all services from database with Gecko-specific fields
+        $services = $this->database->get_all_services_for_gecko();
+        $services_count = count($services);
+        
+        if (empty($services)) {
+            wp_send_json_error('No services found in database');
+        }
+        
+        // Get quantity from request, default to 8, but cap at available services
+        $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 8;
+        $quantity = max(1, min($services_count, $quantity)); // Cannot exceed available services
+        
+        // Prepare response data for Gecko widget
+        $response_services = array();
+        
+        // Convert up to requested quantity for Gecko widget format
+        foreach (array_slice($services, 0, $quantity) as $service) {
+            // Generate WordPress page URL from asn_service_page_id
+            $page_url = '';
+            if (!empty($service->asn_service_page_id)) {
+                $page_url = get_permalink($service->asn_service_page_id);
+            }
+            
+            // Get image URL from rel_image1_id
+            $image_url = '';
+            $image_id = '';
+            if (!empty($service->rel_image1_id)) {
+                $image_url = wp_get_attachment_url($service->rel_image1_id);
+                $image_id = $service->rel_image1_id;
+            }
+            
+            $response_services[] = array(
+                'title' => $service->service_name,
+                'description' => $service->description1_short ?? '',
+                'link' => $page_url,
+                'image_url' => $image_url,
+                'image_id' => $image_id
+            );
+        }
+        
+        wp_send_json_success($response_services);
     }
 }
 

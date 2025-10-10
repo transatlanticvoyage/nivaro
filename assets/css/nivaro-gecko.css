@@ -1,0 +1,367 @@
+/**
+ * Nivaro Gecko Widget Styles
+ * Companion widget for Gecko Setup (Option 6)
+ * Alternative styling for service boxes
+ */
+
+/* Main Widget Container */
+.gecko-widget {
+    width: 100%;
+}
+
+/* Grid Layout */
+.gecko-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    width: 100%;
+}
+
+/* Individual Service Box - Alternative Styling */
+.gecko-service-box {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 2px solid #f5f5f5;
+    position: relative;
+}
+
+.gecko-service-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    border-color: #e0e8ff;
+}
+
+/* Service Image - Fixed area that always displays */
+.gecko-service-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Prevents image area from shrinking */
+}
+
+.gecko-service-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.gecko-service-box:hover .gecko-service-image img {
+    transform: scale(1.08);
+}
+
+/* Service Link - Wraps image and title */
+.gecko-service-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.gecko-service-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Service Title - Different typography */
+.gecko-service-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 15px 20px 0 20px;
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+    text-align: center;
+    padding-bottom: 15px;
+}
+
+/* Service Description - Refined styling */
+.gecko-service-description {
+    font-size: 15px;
+    color: #4a5568;
+    line-height: 1.7;
+    margin: 0 20px 20px 20px;
+    text-align: center;
+}
+
+/* Hover effects for linked elements */
+.gecko-service-link:hover .gecko-service-title {
+    color: #4299e1;
+}
+
+.gecko-service-link:hover .gecko-service-image img {
+    transform: scale(1.05);
+}
+
+/* Default Styling for Empty Image States */
+.gecko-service-image:empty {
+    background: #f7fafc;
+    border: 2px dashed #e2e8f0;
+    color: #a0aec0;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.gecko-service-image:empty::before {
+    content: 'Image Area';
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* When image div exists but has no img inside */
+.gecko-service-image:not(:has(img)) {
+    background: #f7fafc;
+    border: 2px dashed #e2e8f0;
+    color: #a0aec0;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.gecko-service-image:not(:has(img))::before {
+    content: 'Image Area';
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Responsive Design */
+
+/* Large Tablets - 3 columns */
+@media (max-width: 1024px) {
+    .gecko-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
+}
+
+/* Tablets - 2 columns */
+@media (max-width: 768px) {
+    .gecko-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .gecko-service-image {
+        height: 160px; /* Fixed height maintained */
+        flex-shrink: 0;
+    }
+    
+    .gecko-service-content {
+        padding: 20px 15px;
+    }
+    
+    .gecko-service-title {
+        font-size: 18px;
+        margin: 12px 15px 0 15px;
+        padding-bottom: 12px;
+    }
+    
+    .gecko-service-description {
+        font-size: 14px;
+        margin: 0 15px 15px 15px;
+    }
+    
+}
+
+/* Mobile - 1 column */
+@media (max-width: 480px) {
+    .gecko-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .gecko-service-image {
+        height: 140px; /* Fixed height maintained */
+        flex-shrink: 0;
+    }
+    
+    
+    .gecko-service-title {
+        font-size: 16px;
+        margin: 10px 15px 0 15px;
+        padding-bottom: 10px;
+    }
+    
+    .gecko-service-description {
+        font-size: 13px;
+        margin: 0 15px 15px 15px;
+    }
+    
+}
+
+/* Elementor Editor Specific Styles */
+.elementor-editor-active .gecko-service-box {
+    min-height: 320px;
+}
+
+.elementor-editor-active .gecko-service-image {
+    background: #f0f4f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #718096;
+    font-size: 12px;
+}
+
+/* Widget Categories Icon */
+.nivaro .eicon-gallery-grid:before {
+    content: "🦎";
+    font-family: inherit;
+}
+
+/* Enhanced Hover Effects */
+.gecko-service-box {
+    position: relative;
+    overflow: visible;
+}
+
+.gecko-service-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(66, 153, 225, 0.08), rgba(49, 130, 206, 0.08));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+.gecko-service-box:hover::before {
+    opacity: 1;
+}
+
+/* Loading States */
+.gecko-service-box.loading {
+    position: relative;
+}
+
+.gecko-service-box.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Grid Variations */
+.gecko-grid.cols-1 {
+    grid-template-columns: 1fr;
+}
+
+.gecko-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.gecko-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.gecko-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.gecko-grid.cols-6 {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+/* Compact Mode for Editor */
+.elementor-editor .gecko-service-box {
+    font-size: 12px;
+}
+
+.elementor-editor .gecko-service-title {
+    font-size: 16px;
+}
+
+.elementor-editor .gecko-service-description {
+    font-size: 11px;
+}
+
+
+/* Animation for Dynamic Content Loading */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.gecko-service-box {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.gecko-service-box:nth-child(1) { animation-delay: 0.1s; }
+.gecko-service-box:nth-child(2) { animation-delay: 0.15s; }
+.gecko-service-box:nth-child(3) { animation-delay: 0.2s; }
+.gecko-service-box:nth-child(4) { animation-delay: 0.25s; }
+.gecko-service-box:nth-child(5) { animation-delay: 0.3s; }
+.gecko-service-box:nth-child(6) { animation-delay: 0.35s; }
+.gecko-service-box:nth-child(7) { animation-delay: 0.4s; }
+.gecko-service-box:nth-child(8) { animation-delay: 0.45s; }
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+    .gecko-service-box,
+    .gecko-service-image img,
+    .gecko-service-link {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .gecko-service-box {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .gecko-service-title {
+        color: #f7fafc;
+    }
+    
+    .gecko-service-description {
+        color: #cbd5e0;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .gecko-service-box {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+}
+
+/* Special styling to match target page layout */
+.gecko-service-box {
+    /* Add any specific styling here to match the target page */
+    /* This will be the main differentiator from Leatherback */
+}
+

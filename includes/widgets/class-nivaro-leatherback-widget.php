@@ -16,7 +16,15 @@ class Nivaro_Leatherback_Widget extends \Elementor\Widget_Base {
     
     public function __construct($data = [], $args = null) {
         parent::__construct($data, $args);
-        $this->database = new Nivaro_Database();
+        
+        // Use global plugin instance for database access
+        $plugin = Nivaro::get_instance();
+        $this->database = $plugin->database;
+        
+        // Fallback if plugin instance not available
+        if (!$this->database) {
+            $this->database = new Nivaro_Database();
+        }
     }
     
     public function get_name() {

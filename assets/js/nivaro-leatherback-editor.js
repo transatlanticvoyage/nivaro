@@ -6,8 +6,11 @@
 (function($) {
     'use strict';
     
-    // Ensure nivaro_coyote_ajax is available
-    if (typeof nivaro_coyote_ajax === 'undefined') {
+    // Check for AJAX configuration from either source (for backward compatibility)
+    var ajax_config = typeof nivaro_widget_ajax !== 'undefined' ? nivaro_widget_ajax : 
+                      typeof nivaro_coyote_ajax !== 'undefined' ? nivaro_coyote_ajax : null;
+    
+    if (!ajax_config) {
         console.warn('Nivaro Leatherback: AJAX configuration not found');
         return;
     }
@@ -73,11 +76,11 @@
             button.prop('disabled', true);
             
             $.ajax({
-                url: nivaro_coyote_ajax.ajax_url,
+                url: ajax_config.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'nivaro_leatherback_auto_generate',
-                    nonce: nivaro_coyote_ajax.nonce
+                    nonce: ajax_config.nonce
                 },
                 success: function(response) {
                     if (response.success && response.data.settings) {
