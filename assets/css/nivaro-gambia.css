@@ -25,15 +25,19 @@
 }
 
 .gambia-services-list li {
-    margin: 0 0 8px 0;
+    margin: 0 0 10px 0; /* Default spacing, controlled by widget setting */
     padding: 0;
     list-style: none;
+}
+
+.gambia-services-list li:last-child {
+    margin-bottom: 0;
 }
 
 /* Service Links */
 .gambia-service-link {
     color: #007cba;
-    text-decoration: none;
+    text-decoration: none !important;
     font-size: 16px;
     line-height: 1.5;
     transition: color 0.3s ease;
@@ -42,15 +46,17 @@
 
 .gambia-service-link:hover {
     color: #005a87;
-    text-decoration: underline;
+    text-decoration: none !important;
 }
 
 .gambia-service-link:visited {
     color: #007cba;
+    text-decoration: none !important;
 }
 
 .gambia-service-link:active {
     color: #003d5a;
+    text-decoration: none !important;
 }
 
 /* No Services Message */
@@ -140,4 +146,44 @@
     outline: 2px solid #007cba;
     outline-offset: 2px;
     border-radius: 2px;
+}
+
+/* Current Page Link Styling - Applied to li element for full width */
+.gambia-services-list li.current-page {
+    background-color: #007cba;
+    padding: 2px 8px;
+    margin-left: -8px;
+    border-radius: 4px;
+}
+
+.gambia-services-list li.current-page .gambia-service-link {
+    color: #ffffff !important;
+    font-weight: 600;
+    text-decoration: none !important;
+}
+
+.gambia-services-list li.current-page:hover {
+    background-color: #005a87;
+}
+
+.gambia-services-list li.current-page .gambia-service-link:hover,
+.gambia-services-list li.current-page .gambia-service-link:visited,
+.gambia-services-list li.current-page .gambia-service-link:active {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+/* Widget Background Support */
+.gambia-widget {
+    width: 100%;
+    box-sizing: border-box;
+    /* max-width and border-radius are now set inline via PHP */
+}
+
+/* Mobile: Always full width */
+@media (max-width: 768px) {
+    .gambia-widget {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
 }

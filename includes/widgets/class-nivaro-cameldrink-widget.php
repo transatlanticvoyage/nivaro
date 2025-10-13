@@ -487,6 +487,45 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
             ]
         );
         
+        $this->add_control(
+            'service_box_max_width_toggle',
+            [
+                'label' => __('service box max width', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => 'no',
+                'options' => [
+                    'no' => __('no max width', 'nivaro'),
+                    'yes' => __('yes max width', 'nivaro'),
+                ],
+                'label_block' => true,
+            ]
+        );
+        
+        $this->add_control(
+            'service_box_max_width_value',
+            [
+                'label' => __('max width value', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 200,
+                        'max' => 600,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 316,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .cameldrink-service-box' => 'max-width: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    'service_box_max_width_toggle' => 'yes',
+                ],
+            ]
+        );
+        
         $this->end_controls_section();
         
         // Box Style Section
@@ -529,14 +568,315 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
             ]
         );
         
-        $this->add_group_control(
-            \Elementor\Group_Control_Box_Shadow::get_type(),
+        // Custom 4-Side Box Shadow Controls
+        $this->add_control(
+            'box_shadow_heading',
             [
-                'name' => 'box_shadow',
-                'label' => __('Box Shadow', 'nivaro'),
-                'selector' => '{{WRAPPER}} .cameldrink-service-box',
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '<div style="font-size: 16px; font-weight: bold; color: #333; margin: 15px 0 10px 0; border-bottom: 2px solid #ddd; padding-bottom: 8px;">Box Shadow - 4 Sides</div>',
             ]
         );
+        
+        // Top Shadow
+        $this->add_control(
+            'box_shadow_top_heading',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '<div style="font-size: 14px; font-weight: 600; color: #555; margin: 10px 0 5px 0;">Top Shadow</div>',
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_top_blur',
+            [
+                'label' => __('blur radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 30,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 0,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_top_spread',
+            [
+                'label' => __('spread radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => -20,
+                        'max' => 20,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 0,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_top_offset',
+            [
+                'label' => __('offset distance', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => -20,
+                        'max' => 20,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => -2,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_top_color',
+            [
+                'label' => __('color', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => 'rgba(0, 0, 0, 0.1)',
+            ]
+        );
+        
+        // Right Shadow
+        $this->add_control(
+            'box_shadow_right_heading',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '<div style="font-size: 14px; font-weight: 600; color: #555; margin: 15px 0 5px 0;">Right Shadow</div>',
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_right_blur',
+            [
+                'label' => __('blur radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 30,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 4,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_right_spread',
+            [
+                'label' => __('spread radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => -20,
+                        'max' => 20,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 0,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_right_offset',
+            [
+                'label' => __('offset distance', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => -20,
+                        'max' => 20,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 2,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_right_color',
+            [
+                'label' => __('color', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => 'rgba(0, 0, 0, 0.1)',
+            ]
+        );
+        
+        // Bottom Shadow
+        $this->add_control(
+            'box_shadow_bottom_heading',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '<div style="font-size: 14px; font-weight: 600; color: #555; margin: 15px 0 5px 0;">Bottom Shadow</div>',
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_bottom_blur',
+            [
+                'label' => __('blur radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 30,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 8,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_bottom_spread',
+            [
+                'label' => __('spread radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => -20,
+                        'max' => 20,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 0,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_bottom_offset',
+            [
+                'label' => __('offset distance', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => -20,
+                        'max' => 20,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 2,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_bottom_color',
+            [
+                'label' => __('color', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => 'rgba(0, 0, 0, 0.1)',
+            ]
+        );
+        
+        // Left Shadow
+        $this->add_control(
+            'box_shadow_left_heading',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '<div style="font-size: 14px; font-weight: 600; color: #555; margin: 15px 0 5px 0;">Left Shadow</div>',
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_left_blur',
+            [
+                'label' => __('blur radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 30,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 0,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_left_spread',
+            [
+                'label' => __('spread radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => -20,
+                        'max' => 20,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 0,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_left_offset',
+            [
+                'label' => __('offset distance', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => -20,
+                        'max' => 20,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => -2,
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'box_shadow_left_color',
+            [
+                'label' => __('color', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => 'rgba(0, 0, 0, 0.1)',
+            ]
+        );
+        
         
         $this->add_responsive_control(
             'box_padding',
@@ -820,6 +1160,9 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
     protected function render() {
         $settings = $this->get_settings_for_display();
         
+        // Generate 4-side box shadow CSS
+        $this->generate_box_shadow_css($settings);
+        
         // Get filtered services
         $services = $this->get_filtered_services($settings);
         
@@ -837,6 +1180,63 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
             </div>
         </div>
         <?php
+    }
+    
+    /**
+     * Generate CSS for 4-side box shadow
+     */
+    private function generate_box_shadow_css($settings) {
+        $shadow_parts = [];
+        
+        // Top shadow: 0 offset-y blur spread color
+        $top_offset = isset($settings['box_shadow_top_offset']['size']) ? (int)$settings['box_shadow_top_offset']['size'] : -2;
+        $top_blur = isset($settings['box_shadow_top_blur']['size']) ? (int)$settings['box_shadow_top_blur']['size'] : 0;
+        $top_spread = isset($settings['box_shadow_top_spread']['size']) ? (int)$settings['box_shadow_top_spread']['size'] : 0;
+        $top_color = $settings['box_shadow_top_color'] ?? 'rgba(0, 0, 0, 0.1)';
+        
+        if ($top_blur > 0 || $top_offset != 0) {
+            $shadow_parts[] = "0 {$top_offset}px {$top_blur}px {$top_spread}px {$top_color}";
+        }
+        
+        // Right shadow: offset-x 0 blur spread color
+        $right_offset = isset($settings['box_shadow_right_offset']['size']) ? (int)$settings['box_shadow_right_offset']['size'] : 2;
+        $right_blur = isset($settings['box_shadow_right_blur']['size']) ? (int)$settings['box_shadow_right_blur']['size'] : 4;
+        $right_spread = isset($settings['box_shadow_right_spread']['size']) ? (int)$settings['box_shadow_right_spread']['size'] : 0;
+        $right_color = $settings['box_shadow_right_color'] ?? 'rgba(0, 0, 0, 0.1)';
+        
+        if ($right_blur > 0 || $right_offset != 0) {
+            $shadow_parts[] = "{$right_offset}px 0 {$right_blur}px {$right_spread}px {$right_color}";
+        }
+        
+        // Bottom shadow: 0 offset-y blur spread color
+        $bottom_offset = isset($settings['box_shadow_bottom_offset']['size']) ? (int)$settings['box_shadow_bottom_offset']['size'] : 2;
+        $bottom_blur = isset($settings['box_shadow_bottom_blur']['size']) ? (int)$settings['box_shadow_bottom_blur']['size'] : 8;
+        $bottom_spread = isset($settings['box_shadow_bottom_spread']['size']) ? (int)$settings['box_shadow_bottom_spread']['size'] : 0;
+        $bottom_color = $settings['box_shadow_bottom_color'] ?? 'rgba(0, 0, 0, 0.1)';
+        
+        if ($bottom_blur > 0 || $bottom_offset != 0) {
+            $shadow_parts[] = "0 {$bottom_offset}px {$bottom_blur}px {$bottom_spread}px {$bottom_color}";
+        }
+        
+        // Left shadow: offset-x 0 blur spread color
+        $left_offset = isset($settings['box_shadow_left_offset']['size']) ? (int)$settings['box_shadow_left_offset']['size'] : -2;
+        $left_blur = isset($settings['box_shadow_left_blur']['size']) ? (int)$settings['box_shadow_left_blur']['size'] : 0;
+        $left_spread = isset($settings['box_shadow_left_spread']['size']) ? (int)$settings['box_shadow_left_spread']['size'] : 0;
+        $left_color = $settings['box_shadow_left_color'] ?? 'rgba(0, 0, 0, 0.1)';
+        
+        if ($left_blur > 0 || $left_offset != 0) {
+            $shadow_parts[] = "{$left_offset}px 0 {$left_blur}px {$left_spread}px {$left_color}";
+        }
+        
+        // Output combined CSS if we have any shadows
+        if (!empty($shadow_parts)) {
+            $combined_shadow = implode(', ', $shadow_parts);
+            $unique_class = 'cameldrink-shadow-' . $this->get_id();
+            
+            echo '<style>';
+            echo ".elementor-element-{$this->get_id()} .cameldrink-service-box { box-shadow: {$combined_shadow} !important; }";
+            echo '</style>';
+        }
     }
     
     private function render_service_box($service, $settings) {
