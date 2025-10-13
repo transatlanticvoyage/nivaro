@@ -1,0 +1,143 @@
+/**
+ * Nivaro Gambia Services Link List Widget Styles
+ * Clean, simple list styling for service links
+ */
+
+/* Main Widget Container */
+.gambia-widget {
+    width: 100%;
+}
+
+/* List Heading */
+.gambia-list-heading {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    color: #333;
+    line-height: 1.3;
+}
+
+/* Services List */
+.gambia-services-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.gambia-services-list li {
+    margin: 0 0 8px 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Service Links */
+.gambia-service-link {
+    color: #007cba;
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 1.5;
+    transition: color 0.3s ease;
+    display: inline-block;
+}
+
+.gambia-service-link:hover {
+    color: #005a87;
+    text-decoration: underline;
+}
+
+.gambia-service-link:visited {
+    color: #007cba;
+}
+
+.gambia-service-link:active {
+    color: #003d5a;
+}
+
+/* No Services Message */
+.gambia-no-services {
+    text-align: center;
+    padding: 30px 20px;
+    background: #f9f9f9;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    color: #666;
+    font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .gambia-list-heading {
+        font-size: 20px;
+        margin: 0 0 15px 0;
+    }
+    
+    .gambia-service-link {
+        font-size: 15px;
+    }
+    
+    .gambia-services-list li {
+        margin: 0 0 6px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .gambia-list-heading {
+        font-size: 18px;
+        margin: 0 0 12px 0;
+    }
+    
+    .gambia-service-link {
+        font-size: 14px;
+    }
+    
+    .gambia-services-list li {
+        margin: 0 0 5px 0;
+    }
+}
+
+/* Editor Preview Styles */
+.elementor-editor-active .gambia-widget {
+    min-height: 100px;
+}
+
+/* Alternative List Style Options */
+.gambia-widget.style-bullets .gambia-services-list {
+    padding-left: 20px;
+}
+
+.gambia-widget.style-bullets .gambia-services-list li {
+    list-style: disc;
+}
+
+.gambia-widget.style-numbers .gambia-services-list {
+    padding-left: 20px;
+}
+
+.gambia-widget.style-numbers .gambia-services-list li {
+    list-style: decimal;
+}
+
+/* Compact variant */
+.gambia-widget.compact .gambia-services-list li {
+    margin: 0 0 4px 0;
+}
+
+.gambia-widget.compact .gambia-service-link {
+    font-size: 14px;
+}
+
+/* Hover effects for the entire list item */
+.gambia-services-list li:hover {
+    background: rgba(0, 124, 186, 0.05);
+    padding: 2px 8px;
+    margin-left: -8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+/* Focus styles for accessibility */
+.gambia-service-link:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+    border-radius: 2px;
+}

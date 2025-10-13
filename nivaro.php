@@ -79,6 +79,14 @@ class Nivaro {
         // Gecko auto-generation
         add_action('wp_ajax_nivaro_gecko_auto_generate', array($this, 'ajax_gecko_auto_generate'));
         add_action('wp_ajax_nopriv_nivaro_gecko_auto_generate', array($this, 'ajax_gecko_auto_generate'));
+        
+        // Cameldrink count update
+        add_action('wp_ajax_nivaro_cameldrink_get_count', array($this, 'ajax_cameldrink_get_count'));
+        add_action('wp_ajax_nopriv_nivaro_cameldrink_get_count', array($this, 'ajax_cameldrink_get_count'));
+        
+        // Gambia count update
+        add_action('wp_ajax_nivaro_gambia_get_count', array($this, 'ajax_gambia_get_count'));
+        add_action('wp_ajax_nopriv_nivaro_gambia_get_count', array($this, 'ajax_gambia_get_count'));
     }
     
     public function elementor_init() {
@@ -111,6 +119,16 @@ class Nivaro {
         $gecko_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-gecko-widget.php';
         if (file_exists($gecko_file)) {
             require_once $gecko_file;
+        }
+        
+        $cameldrink_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-cameldrink-widget.php';
+        if (file_exists($cameldrink_file)) {
+            require_once $cameldrink_file;
+        }
+        
+        $gambia_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-gambia-widget.php';
+        if (file_exists($gambia_file)) {
+            require_once $gambia_file;
         }
         
         // Load container extensions
@@ -181,6 +199,24 @@ class Nivaro {
                 error_log('Nivaro: Failed to register Gecko widget - ' . $e->getMessage());
             }
         }
+        
+        // Register Cameldrink Widget
+        if (class_exists('Nivaro_Cameldrink_Widget')) {
+            try {
+                $widgets_manager->register(new Nivaro_Cameldrink_Widget());
+            } catch (Exception $e) {
+                error_log('Nivaro: Failed to register Cameldrink widget - ' . $e->getMessage());
+            }
+        }
+        
+        // Register Gambia Widget
+        if (class_exists('Nivaro_Gambia_Widget')) {
+            try {
+                $widgets_manager->register(new Nivaro_Gambia_Widget());
+            } catch (Exception $e) {
+                error_log('Nivaro: Failed to register Gambia widget - ' . $e->getMessage());
+            }
+        }
     }
     
     /**
@@ -215,7 +251,7 @@ class Nivaro {
             return false;
         }
         
-        $nivaro_widgets = array('nivaro-leatherback', 'nivaro-gecko', 'nivaro-ocelot-service');
+        $nivaro_widgets = array('nivaro-leatherback', 'nivaro-gecko', 'nivaro-ocelot-service', 'nivaro-cameldrink', 'nivaro-gambia');
         
         foreach ($elements as $element) {
             if (isset($element['widgetType']) && in_array($element['widgetType'], $nivaro_widgets)) {
@@ -253,6 +289,22 @@ class Nivaro {
         wp_enqueue_style(
             'nivaro-gecko',
             NIVARO_PLUGIN_URL . 'assets/css/nivaro-gecko.css',
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+        
+        // Enqueue Cameldrink styles
+        wp_enqueue_style(
+            'nivaro-cameldrink',
+            NIVARO_PLUGIN_URL . 'assets/css/nivaro-cameldrink.css',
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+        
+        // Enqueue Gambia styles
+        wp_enqueue_style(
+            'nivaro-gambia',
+            NIVARO_PLUGIN_URL . 'assets/css/nivaro-gambia.css',
             array(),
             NIVARO_PLUGIN_VERSION
         );
@@ -467,6 +519,110 @@ class Nivaro {
         }
         
         wp_send_json_success($response_services);
+    }
+    
+    /**
+     * AJAX handler for Cameldrink widget count updates
+     */
+    public function ajax_cameldrink_get_count() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_coyote_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        // Get filter values from request
+        $is_active = sanitize_text_field($_POST['is_active'] ?? 'any');
+        $is_pinned = sanitize_text_field($_POST['is_pinned'] ?? 'any');
+        
+        // Build WHERE clause based on filters
+        $where_conditions = [];
+        
+        // Filter by is_active
+        if ($is_active === 'yes') {
+            $where_conditions[] = 'is_active = 1';
+        } elseif ($is_active === 'no') {
+            $where_conditions[] = '(is_active = 0 OR is_active IS NULL)';
+        }
+        
+        // Filter by is_pinned
+        if ($is_pinned === 'yes') {
+            $where_conditions[] = 'is_pinned = 1';
+        } elseif ($is_pinned === 'no') {
+            $where_conditions[] = '(is_pinned = 0 OR is_pinned IS NULL)';
+        }
+        
+        // Build WHERE clause
+        $where = '';
+        if (!empty($where_conditions)) {
+            $where = 'WHERE ' . implode(' AND ', $where_conditions);
+        }
+        
+        // Get count of filtered services
+        $query = "SELECT COUNT(*) FROM {$table_name} {$where}";
+        $count = $wpdb->get_var($query);
+        
+        wp_send_json_success(array(
+            'count' => intval($count),
+            'filters' => array(
+                'is_active' => $is_active,
+                'is_pinned' => $is_pinned
+            )
+        ));
+    }
+    
+    /**
+     * AJAX handler for Gambia widget count updates
+     */
+    public function ajax_gambia_get_count() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'nivaro_coyote_nonce')) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Security check failed')));
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        // Get filter values from request
+        $is_active = sanitize_text_field($_POST['is_active'] ?? 'any');
+        $is_pinned = sanitize_text_field($_POST['is_pinned'] ?? 'any');
+        
+        // Build WHERE clause based on filters
+        $where_conditions = [];
+        
+        // Filter by is_active
+        if ($is_active === 'yes') {
+            $where_conditions[] = 'is_active = 1';
+        } elseif ($is_active === 'no') {
+            $where_conditions[] = '(is_active = 0 OR is_active IS NULL)';
+        }
+        
+        // Filter by is_pinned
+        if ($is_pinned === 'yes') {
+            $where_conditions[] = 'is_pinned = 1';
+        } elseif ($is_pinned === 'no') {
+            $where_conditions[] = '(is_pinned = 0 OR is_pinned IS NULL)';
+        }
+        
+        // Build WHERE clause
+        $where = '';
+        if (!empty($where_conditions)) {
+            $where = 'WHERE ' . implode(' AND ', $where_conditions);
+        }
+        
+        // Get count of filtered services
+        $query = "SELECT COUNT(*) FROM {$table_name} {$where}";
+        $count = $wpdb->get_var($query);
+        
+        wp_send_json_success(array(
+            'count' => intval($count),
+            'filters' => array(
+                'is_active' => $is_active,
+                'is_pinned' => $is_pinned
+            )
+        ));
     }
 }
 
