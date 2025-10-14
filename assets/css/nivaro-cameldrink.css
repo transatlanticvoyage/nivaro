@@ -201,6 +201,18 @@
     }
 }
 
+/* Force 1 column on mobile devices */
+@media (max-width: 767px) {
+    .cameldrink-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+    
+    .cameldrink-service-box {
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 480px) {
     .cameldrink-grid {
         grid-template-columns: 1fr;
