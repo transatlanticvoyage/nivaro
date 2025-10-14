@@ -1377,22 +1377,29 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
     private function get_filtered_services($settings) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'zen_services';
+        $posts_table = $wpdb->prefix . 'posts';
         
         // Build WHERE clause based on filters
         $where_conditions = [];
         
+        // Always filter out services with invalid or unpublished pages
+        $where_conditions[] = 's.asn_service_page_id IS NOT NULL';
+        $where_conditions[] = "s.asn_service_page_id != ''";
+        $where_conditions[] = 'p.ID IS NOT NULL';
+        $where_conditions[] = "p.post_status = 'publish'";
+        
         // Filter by is_active
         if ($settings['filter_is_active'] === 'yes') {
-            $where_conditions[] = 'is_active = 1';
+            $where_conditions[] = 's.is_active = 1';
         } elseif ($settings['filter_is_active'] === 'no') {
-            $where_conditions[] = '(is_active = 0 OR is_active IS NULL)';
+            $where_conditions[] = '(s.is_active = 0 OR s.is_active IS NULL)';
         }
         
         // Filter by is_pinned
         if ($settings['filter_is_pinned'] === 'yes') {
-            $where_conditions[] = 'is_pinned = 1';
+            $where_conditions[] = 's.is_pinned = 1';
         } elseif ($settings['filter_is_pinned'] === 'no') {
-            $where_conditions[] = '(is_pinned = 0 OR is_pinned IS NULL)';
+            $where_conditions[] = '(s.is_pinned = 0 OR s.is_pinned IS NULL)';
         }
         
         // Build WHERE clause
@@ -1405,20 +1412,26 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
         $order_by = '';
         switch ($settings['filter_display_order']) {
             case 'position_in_custom_order':
-                $order_by = 'ORDER BY position_in_custom_order ASC, service_id ASC';
+                $order_by = 'ORDER BY s.position_in_custom_order ASC, s.service_id ASC';
                 break;
             case 'pinned_alpha':
                 // Pinned items first (sorted alphabetically), then unpinned (sorted alphabetically)
-                $order_by = 'ORDER BY COALESCE(is_pinned, 0) DESC, service_name ASC';
+                $order_by = 'ORDER BY COALESCE(s.is_pinned, 0) DESC, s.service_name ASC';
                 break;
             case 'service_id':
             default:
-                $order_by = 'ORDER BY service_id ASC';
+                $order_by = 'ORDER BY s.service_id ASC';
                 break;
         }
         
-        // Build and execute query
-        $query = "SELECT * FROM {$table_name} {$where} {$order_by}";
+        // Build and execute query with LEFT JOIN to check post validity
+        $query = "
+            SELECT s.* 
+            FROM {$table_name} s
+            LEFT JOIN {$posts_table} p ON s.asn_service_page_id = p.ID
+            {$where} 
+            {$order_by}
+        ";
         $services = $wpdb->get_results($query);
         
         // Add dynamic links to services
