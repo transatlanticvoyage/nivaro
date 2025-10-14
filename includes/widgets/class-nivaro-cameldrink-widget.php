@@ -661,6 +661,42 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
         
         $this->end_controls_section();
         
+        // Empty Items Filter Section
+        $this->start_controls_section(
+            'empty_items_filter_section',
+            [
+                'label' => __('Empty Items Filter', 'nivaro'),
+                'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+            ]
+        );
+        
+        $this->add_control(
+            'empty_items_filter_heading',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '<div style="font-size: 14px; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
+                    <strong>Filter out empty items</strong><br>
+                    <span style="font-size: 12px; color: #666;">No empty asn_service_page_id field, no drafts, no non-existent pages/posts</span>
+                </div>',
+            ]
+        );
+        
+        $this->add_control(
+            'filter_empty_items',
+            [
+                'label' => __('Filter out empty items', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => 'yes',
+                'options' => [
+                    'yes' => __('Yes filter these out (default option)', 'nivaro'),
+                    'no' => __('No - do not filter these out', 'nivaro'),
+                ],
+                'label_block' => true,
+            ]
+        );
+        
+        $this->end_controls_section();
+        
         // General Widget Style Settings Section
         $this->start_controls_section(
             'general_widget_style_section',
@@ -1382,11 +1418,16 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
         // Build WHERE clause based on filters
         $where_conditions = [];
         
-        // Always filter out services with invalid or unpublished pages
-        $where_conditions[] = 's.asn_service_page_id IS NOT NULL';
-        $where_conditions[] = "s.asn_service_page_id != ''";
-        $where_conditions[] = 'p.ID IS NOT NULL';
-        $where_conditions[] = "p.post_status = 'publish'";
+        // Check if we should filter out empty items (default is yes)
+        $filter_empty = isset($settings['filter_empty_items']) ? $settings['filter_empty_items'] : 'yes';
+        
+        if ($filter_empty === 'yes') {
+            // Filter out services with invalid or unpublished pages
+            $where_conditions[] = 's.asn_service_page_id IS NOT NULL';
+            $where_conditions[] = "s.asn_service_page_id != ''";
+            $where_conditions[] = 'p.ID IS NOT NULL';
+            $where_conditions[] = "p.post_status = 'publish'";
+        }
         
         // Filter by is_active
         if ($settings['filter_is_active'] === 'yes') {
