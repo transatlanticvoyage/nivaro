@@ -233,100 +233,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
                         <p style="margin-top: 10px; font-size: 12px; color: #666; font-style: italic;">
                             After applying a preset, you can still customize individual settings below
                         </p>
-                    </div>
-                    <script>
-                    (function() {
-                        // Wait for jQuery and Elementor to be available
-                        var checkReady = setInterval(function() {
-                            if (typeof jQuery !== "undefined" && jQuery("[data-setting=\'style_preset_selector\']").length) {
-                                clearInterval(checkReady);
-                                initGambiaPresets();
-                            }
-                        }, 100);
-                        
-                        function initGambiaPresets() {
-                            var $ = jQuery;
-                            var stylePresets = ' . json_encode($this->get_style_presets()) . ';
-                            
-                            console.log("Gambia presets initialized", stylePresets);
-                            
-                            // Apply preset button click handler
-                            $(document).off("click.gambiaPreset").on("click.gambiaPreset", "#gambia-apply-preset", function(e) {
-                                e.preventDefault();
-                                console.log("Apply preset clicked");
-                                
-                                var selectedPreset = $("[data-setting=\'style_preset_selector\']").val();
-                                console.log("Selected preset:", selectedPreset);
-                                
-                                if (!selectedPreset || !stylePresets[selectedPreset]) {
-                                    console.log("No valid preset selected");
-                                    return;
-                                }
-                                
-                                var presetSettings = stylePresets[selectedPreset].settings;
-                                console.log("Applying settings:", presetSettings);
-                                
-                                // Apply each preset setting to its corresponding control
-                                for (var settingKey in presetSettings) {
-                                    var settingValue = presetSettings[settingKey];
-                                    
-                                    // Find the control container
-                                    var $controlContainer = $(".elementor-control-" + settingKey);
-                                    
-                                    if ($controlContainer.length) {
-                                        var $input = $controlContainer.find("input, select, textarea").first();
-                                        
-                                        if ($input.length) {
-                                            // Handle different control types
-                                            if (typeof settingValue === "object" && settingValue.size !== undefined) {
-                                                // Slider control
-                                                $input.val(settingValue.size);
-                                                $input.trigger("input").trigger("change");
-                                                
-                                                // Update the slider UI
-                                                var $slider = $controlContainer.find(".elementor-slider");
-                                                if ($slider.length && $slider.data("uiSlider")) {
-                                                    $slider.slider("value", settingValue.size);
-                                                }
-                                            } else if ($input.attr("type") === "color" || $controlContainer.hasClass("elementor-control-type-color")) {
-                                                // Color control
-                                                $input.val(settingValue);
-                                                $input.trigger("input").trigger("change");
-                                                
-                                                // Update color picker button if exists
-                                                var $colorButton = $controlContainer.find(".pcr-button");
-                                                if ($colorButton.length) {
-                                                    $colorButton.css("color", settingValue);
-                                                }
-                                            } else {
-                                                // Regular control
-                                                $input.val(settingValue);
-                                                $input.trigger("input").trigger("change");
-                                            }
-                                            
-                                            console.log("Set " + settingKey + " to", settingValue);
-                                        }
-                                    }
-                                }
-                                
-                                // Show success message
-                                $("#gambia-apply-preset").text("Preset Applied!");
-                                $("#gambia-apply-preset").css("background", "#46b450");
-                                
-                                // Reset button after 2 seconds
-                                setTimeout(function() {
-                                    $("#gambia-apply-preset").text("Apply Selected Preset");
-                                    $("#gambia-apply-preset").css("background", "#007cba");
-                                }, 2000);
-                                
-                                // Trigger Elementor to recognize changes
-                                if (typeof elementor !== "undefined") {
-                                    elementor.reloadPreview();
-                                }
-                            });
-                        }
-                    })();
-                    </script>',
+                    </div>',
             ]
         );
         
@@ -459,54 +366,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
                                 style="width: 100%; padding: 12px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
                             Save Filter Settings
                         </button>
-                    </div>
-                    <script>
-                    jQuery(document).ready(function($) {
-                        // Function to update filtered count
-                        function updateGambiaCount() {
-                            var isActive = $("[data-setting=\'filter_is_active\']").val() || "any";
-                            var isPinned = $("[data-setting=\'filter_is_pinned\']").val() || "any";
-                            
-                            $.ajax({
-                                url: nivaro_coyote_ajax.ajax_url,
-                                type: "POST",
-                                data: {
-                                    action: "nivaro_gambia_get_count",
-                                    is_active: isActive,
-                                    is_pinned: isPinned,
-                                    nonce: nivaro_coyote_ajax.nonce
-                                },
-                                success: function(response) {
-                                    if (response.success) {
-                                        $("#gambia-filtered-count").text(response.data.count);
-                                    }
-                                }
-                            });
-                        }
-                        
-                        // Update count when filters change
-                        $("[data-setting=\'filter_is_active\'], [data-setting=\'filter_is_pinned\']").on("change", function() {
-                            updateGambiaCount();
-                        });
-                        
-                        // Save button click handler
-                        $(document).on("click", "#gambia-save-filters", function(e) {
-                            e.preventDefault();
-                            
-                            // Trigger Elementor save
-                            if (typeof elementor !== "undefined") {
-                                elementor.saver.setFlagEditorChange(true);
-                                $(this).text("Settings Saved!");
-                                setTimeout(function() {
-                                    $("#gambia-save-filters").text("Save Filter Settings");
-                                }, 2000);
-                            }
-                        });
-                        
-                        // Initial count update
-                        setTimeout(updateGambiaCount, 500);
-                    });
-                    </script>',
+                    </div>',
             ]
         );
         

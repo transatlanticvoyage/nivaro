@@ -47,7 +47,233 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
         return ['services', 'cameldrink', 'filter', 'dynamic', 'nivaro'];
     }
     
+    /**
+     * Get preset options for dropdown
+     */
+    private function get_style_preset_options() {
+        $presets = $this->get_style_presets();
+        $options = [];
+        foreach ($presets as $key => $preset) {
+            $options[$key] = $preset['label'];
+        }
+        return $options;
+    }
+    
+    /**
+     * Style Presets Configuration
+     */
+    private function get_style_presets() {
+        return [
+            'skyburn' => [
+                'label' => __('Skyburn Preset (default)', 'nivaro'),
+                'settings' => [
+                    // Content Settings
+                    'image_source' => 'rel_image1_id',
+                    'image_frame_height' => '200',
+                    'image_alignment' => 'center',
+                    'image_display_philosophy' => 'contain',
+                    'display_learn_more_button' => 'no',
+                    'place_image_inside_subframe' => 'yes',
+                    'subframe_height_percentage' => '80',
+                    // General Widget Style
+                    'widget_border_radius' => ['size' => 12, 'unit' => 'px'],
+                    'widget_background_color' => '',
+                    // Grid Layout
+                    'columns' => '4',
+                    'gap' => ['size' => 20, 'unit' => 'px'],
+                    'service_box_max_width_toggle' => 'yes',
+                    'service_box_max_width_value' => ['size' => 316, 'unit' => 'px'],
+                    // Box Shadows
+                    'box_shadow_top_blur' => ['size' => 6, 'unit' => 'px'],
+                    'box_shadow_top_spread' => ['size' => 3, 'unit' => 'px'],
+                    'box_shadow_top_offset' => ['size' => -2, 'unit' => 'px'],
+                    'box_shadow_top_color' => 'rgba(0, 0, 0, 0.1)',
+                    'box_shadow_right_blur' => ['size' => 4, 'unit' => 'px'],
+                    'box_shadow_right_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_right_offset' => ['size' => 2, 'unit' => 'px'],
+                    'box_shadow_right_color' => 'rgba(0, 0, 0, 0.05)',
+                    'box_shadow_bottom_blur' => ['size' => 8, 'unit' => 'px'],
+                    'box_shadow_bottom_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_bottom_offset' => ['size' => 2, 'unit' => 'px'],
+                    'box_shadow_bottom_color' => 'rgba(0, 0, 0, 0.1)',
+                    'box_shadow_left_blur' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_left_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_left_offset' => ['size' => -2, 'unit' => 'px'],
+                    'box_shadow_left_color' => 'rgba(0, 0, 0, 0.1)',
+                    // Image
+                    'image_height' => ['size' => 200, 'unit' => 'px'],
+                    // Typography
+                    'title_color' => '#3163C5',
+                    'description_color' => '',
+                    // Button
+                    'button_text_color' => '#ffffff',
+                ]
+            ],
+            'midnight_elegance' => [
+                'label' => __('Midnight Elegance', 'nivaro'),
+                'settings' => [
+                    // General Widget Style
+                    'widget_border_radius' => ['size' => 8, 'unit' => 'px'],
+                    'widget_background_color' => '#1a1a2e',
+                    // Grid Layout
+                    'columns' => '3',
+                    'gap' => ['size' => 30, 'unit' => 'px'],
+                    'service_box_max_width_toggle' => 'yes',
+                    'service_box_max_width_value' => ['size' => 350, 'unit' => 'px'],
+                    // Box Shadows - Dramatic dark shadows
+                    'box_shadow_top_blur' => ['size' => 15, 'unit' => 'px'],
+                    'box_shadow_top_spread' => ['size' => 5, 'unit' => 'px'],
+                    'box_shadow_top_offset' => ['size' => -5, 'unit' => 'px'],
+                    'box_shadow_top_color' => 'rgba(0, 0, 0, 0.4)',
+                    'box_shadow_right_blur' => ['size' => 15, 'unit' => 'px'],
+                    'box_shadow_right_spread' => ['size' => 5, 'unit' => 'px'],
+                    'box_shadow_right_offset' => ['size' => 5, 'unit' => 'px'],
+                    'box_shadow_right_color' => 'rgba(0, 0, 0, 0.4)',
+                    'box_shadow_bottom_blur' => ['size' => 20, 'unit' => 'px'],
+                    'box_shadow_bottom_spread' => ['size' => 8, 'unit' => 'px'],
+                    'box_shadow_bottom_offset' => ['size' => 10, 'unit' => 'px'],
+                    'box_shadow_bottom_color' => 'rgba(0, 0, 0, 0.5)',
+                    'box_shadow_left_blur' => ['size' => 15, 'unit' => 'px'],
+                    'box_shadow_left_spread' => ['size' => 5, 'unit' => 'px'],
+                    'box_shadow_left_offset' => ['size' => -5, 'unit' => 'px'],
+                    'box_shadow_left_color' => 'rgba(0, 0, 0, 0.4)',
+                    // Image
+                    'image_height' => ['size' => 250, 'unit' => 'px'],
+                    // Typography
+                    'title_color' => '#f39c12',
+                    'description_color' => '#ecf0f1',
+                    // Button
+                    'button_text_color' => '#1a1a2e',
+                ]
+            ],
+            'fresh_mint' => [
+                'label' => __('Fresh Mint', 'nivaro'),
+                'settings' => [
+                    // General Widget Style
+                    'widget_border_radius' => ['size' => 20, 'unit' => 'px'],
+                    'widget_background_color' => '#f0f9ff',
+                    // Grid Layout
+                    'columns' => '4',
+                    'gap' => ['size' => 15, 'unit' => 'px'],
+                    'service_box_max_width_toggle' => 'yes',
+                    'service_box_max_width_value' => ['size' => 280, 'unit' => 'px'],
+                    // Box Shadows - Soft, minimal shadows
+                    'box_shadow_top_blur' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_top_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_top_offset' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_top_color' => 'rgba(0, 0, 0, 0)',
+                    'box_shadow_right_blur' => ['size' => 10, 'unit' => 'px'],
+                    'box_shadow_right_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_right_offset' => ['size' => 3, 'unit' => 'px'],
+                    'box_shadow_right_color' => 'rgba(16, 185, 129, 0.1)',
+                    'box_shadow_bottom_blur' => ['size' => 15, 'unit' => 'px'],
+                    'box_shadow_bottom_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_bottom_offset' => ['size' => 5, 'unit' => 'px'],
+                    'box_shadow_bottom_color' => 'rgba(16, 185, 129, 0.15)',
+                    'box_shadow_left_blur' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_left_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_left_offset' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_left_color' => 'rgba(0, 0, 0, 0)',
+                    // Image
+                    'image_height' => ['size' => 180, 'unit' => 'px'],
+                    // Typography
+                    'title_color' => '#10b981',
+                    'description_color' => '#6b7280',
+                    // Button
+                    'button_text_color' => '#ffffff',
+                ]
+            ],
+            'corporate_clean' => [
+                'label' => __('Corporate Clean', 'nivaro'),
+                'settings' => [
+                    // General Widget Style
+                    'widget_border_radius' => ['size' => 0, 'unit' => 'px'],
+                    'widget_background_color' => '#ffffff',
+                    // Grid Layout
+                    'columns' => '3',
+                    'gap' => ['size' => 40, 'unit' => 'px'],
+                    'service_box_max_width_toggle' => 'no',
+                    'service_box_max_width_value' => ['size' => 400, 'unit' => 'px'],
+                    // Box Shadows - Sharp, professional shadows
+                    'box_shadow_top_blur' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_top_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_top_offset' => ['size' => -1, 'unit' => 'px'],
+                    'box_shadow_top_color' => 'rgba(0, 0, 0, 0.1)',
+                    'box_shadow_right_blur' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_right_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_right_offset' => ['size' => 1, 'unit' => 'px'],
+                    'box_shadow_right_color' => 'rgba(0, 0, 0, 0.1)',
+                    'box_shadow_bottom_blur' => ['size' => 4, 'unit' => 'px'],
+                    'box_shadow_bottom_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_bottom_offset' => ['size' => 1, 'unit' => 'px'],
+                    'box_shadow_bottom_color' => 'rgba(0, 0, 0, 0.12)',
+                    'box_shadow_left_blur' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_left_spread' => ['size' => 0, 'unit' => 'px'],
+                    'box_shadow_left_offset' => ['size' => -1, 'unit' => 'px'],
+                    'box_shadow_left_color' => 'rgba(0, 0, 0, 0.1)',
+                    // Image
+                    'image_height' => ['size' => 220, 'unit' => 'px'],
+                    // Typography
+                    'title_color' => '#1f2937',
+                    'description_color' => '#4b5563',
+                    // Button
+                    'button_text_color' => '#ffffff',
+                ]
+            ],
+        ];
+    }
+    
     protected function register_controls() {
+        
+        // Style Preset Section - At the very top
+        $this->start_controls_section(
+            'style_preset_section',
+            [
+                'label' => __('Style Preset', 'nivaro'),
+                'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+            ]
+        );
+        
+        $this->add_control(
+            'style_preset_selector',
+            [
+                'label' => __('Choose Style Preset', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => 'skyburn',
+                'options' => $this->get_style_preset_options(),
+                'label_block' => true,
+            ]
+        );
+        
+        // Add preset data as a hidden control
+        $this->add_control(
+            'style_preset_data',
+            [
+                'type' => \Elementor\Controls_Manager::HIDDEN,
+                'default' => json_encode($this->get_style_presets()),
+            ]
+        );
+        
+        $this->add_control(
+            'style_preset_apply_button',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '
+                    <div style="margin-top: 15px;">
+                        <button type="button" 
+                                id="cameldrink-apply-preset" 
+                                class="elementor-button elementor-button-default" 
+                                style="width: 100%; padding: 10px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                            Apply Selected Preset
+                        </button>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666; font-style: italic;">
+                            After applying a preset, you can still customize individual settings below
+                        </p>
+                    </div>',
+            ]
+        );
+        
+        $this->end_controls_section();
         
         // Content Section
         $this->start_controls_section(
@@ -377,10 +603,10 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('place image inside subframe', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::SELECT,
-                'default' => 'no',
+                'default' => 'yes',
                 'options' => [
-                    'no' => __('no (default option)', 'nivaro'),
-                    'yes' => __('yes', 'nivaro'),
+                    'no' => __('no', 'nivaro'),
+                    'yes' => __('yes (default option)', 'nivaro'),
                 ],
                 'label_block' => true,
             ]
@@ -458,7 +684,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 8,
+                    'size' => 12,
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .cameldrink-service-box' => 'border-radius: {{SIZE}}{{UNIT}} !important;',
@@ -537,7 +763,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('service box max width', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::SELECT,
-                'default' => 'no',
+                'default' => 'yes',
                 'options' => [
                     'no' => __('no max width', 'nivaro'),
                     'yes' => __('yes max width', 'nivaro'),
@@ -645,7 +871,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 0,
+                    'size' => 6,
                 ],
             ]
         );
@@ -664,7 +890,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 0,
+                    'size' => 3,
                 ],
             ]
         );
@@ -1006,6 +1232,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('Title Color', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#3163C5',
                 'selectors' => [
                     '{{WRAPPER}} .cameldrink-service-title' => 'color: {{VALUE}};',
                 ],

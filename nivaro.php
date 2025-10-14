@@ -332,6 +332,24 @@ class Nivaro {
             true
         );
         
+        // Enqueue Gambia editor script
+        wp_enqueue_script(
+            'nivaro-gambia-editor',
+            NIVARO_PLUGIN_URL . 'assets/js/nivaro-gambia-editor.js',
+            array('jquery', 'elementor-editor'),
+            NIVARO_PLUGIN_VERSION,
+            true
+        );
+        
+        // Enqueue Cameldrink editor script
+        wp_enqueue_script(
+            'nivaro-cameldrink-editor',
+            NIVARO_PLUGIN_URL . 'assets/js/nivaro-cameldrink-editor.js',
+            array('jquery', 'elementor-editor'),
+            NIVARO_PLUGIN_VERSION,
+            true
+        );
+        
         // Localize scripts with AJAX data
         $ajax_data = array(
             'ajax_url' => admin_url('admin-ajax.php'),
@@ -340,6 +358,8 @@ class Nivaro {
         
         wp_localize_script('nivaro-leatherback-editor', 'nivaro_widget_ajax', $ajax_data);
         wp_localize_script('nivaro-gecko-editor', 'nivaro_widget_ajax', $ajax_data);
+        wp_localize_script('nivaro-gambia-editor', 'nivaro_widget_ajax', $ajax_data);
+        wp_localize_script('nivaro-cameldrink-editor', 'nivaro_widget_ajax', $ajax_data);
     }
     
     /**
