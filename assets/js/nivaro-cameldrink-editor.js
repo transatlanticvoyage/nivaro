@@ -20,6 +20,7 @@
                         'display_learn_more_button': 'no',
                         'place_image_inside_subframe': 'yes',
                         'subframe_height_percentage': '80',
+                        'subframe_bg_color': '#f5f5f5',
                         // Style Settings
                         'widget_border_radius': {'size': 12, 'unit': 'px'},
                         'widget_background_color': '',
@@ -52,6 +53,16 @@
                 'midnight_elegance': {
                     'label': 'Midnight Elegance',
                     'settings': {
+                        // Content Settings
+                        'image_source': 'rel_image1_id',
+                        'image_frame_height': '200',
+                        'image_alignment': 'center',
+                        'image_display_philosophy': 'contain',
+                        'display_learn_more_button': 'no',
+                        'place_image_inside_subframe': 'yes',
+                        'subframe_height_percentage': '80',
+                        'subframe_bg_color': '#0f0f1e',
+                        // Style Settings
                         'widget_border_radius': {'size': 8, 'unit': 'px'},
                         'widget_background_color': '#1a1a2e',
                         'columns': '3',
@@ -83,6 +94,16 @@
                 'fresh_mint': {
                     'label': 'Fresh Mint',
                     'settings': {
+                        // Content Settings
+                        'image_source': 'rel_image1_id',
+                        'image_frame_height': '200',
+                        'image_alignment': 'center',
+                        'image_display_philosophy': 'contain',
+                        'display_learn_more_button': 'no',
+                        'place_image_inside_subframe': 'yes',
+                        'subframe_height_percentage': '80',
+                        'subframe_bg_color': '#e6f7ff',
+                        // Style Settings
                         'widget_border_radius': {'size': 20, 'unit': 'px'},
                         'widget_background_color': '#f0f9ff',
                         'columns': '4',
@@ -114,6 +135,16 @@
                 'corporate_clean': {
                     'label': 'Corporate Clean',
                     'settings': {
+                        // Content Settings
+                        'image_source': 'rel_image1_id',
+                        'image_frame_height': '200',
+                        'image_alignment': 'center',
+                        'image_display_philosophy': 'contain',
+                        'display_learn_more_button': 'no',
+                        'place_image_inside_subframe': 'yes',
+                        'subframe_height_percentage': '80',
+                        'subframe_bg_color': '#fafafa',
+                        // Style Settings
                         'widget_border_radius': {'size': 0, 'unit': 'px'},
                         'widget_background_color': '#ffffff',
                         'columns': '3',

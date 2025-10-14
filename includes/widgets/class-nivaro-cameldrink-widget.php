@@ -75,6 +75,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
                     'display_learn_more_button' => 'no',
                     'place_image_inside_subframe' => 'yes',
                     'subframe_height_percentage' => '80',
+                    'subframe_bg_color' => '#f5f5f5',
                     // General Widget Style
                     'widget_border_radius' => ['size' => 12, 'unit' => 'px'],
                     'widget_background_color' => '',
@@ -654,6 +655,20 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
                 'condition' => [
                     'place_image_inside_subframe' => 'yes',
                     'subframe_height_percentage' => 'custom',
+                ],
+                'label_block' => true,
+            ]
+        );
+        
+        // Subframe Background Color
+        $this->add_control(
+            'subframe_bg_color',
+            [
+                'label' => __('bg color between subframe and main frame', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#f5f5f5',
+                'condition' => [
+                    'place_image_inside_subframe' => 'yes',
                 ],
                 'label_block' => true,
             ]
@@ -1601,6 +1616,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
         if ($subframe_height === 'custom') {
             $subframe_height = $settings['subframe_height_custom'] ?? 75;
         }
+        $subframe_bg_color = $settings['subframe_bg_color'] ?? '#f5f5f5';
         
         // Convert alignment to object-position value
         $object_position = $image_alignment . ' center';
@@ -1635,7 +1651,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
         <div class="cameldrink-service-box">
             <?php if ($image_url): ?>
                 <div class="<?php echo esc_attr($container_classes); ?>" 
-                     style="height: <?php echo esc_attr($frame_height); ?>px;">
+                     style="height: <?php echo esc_attr($frame_height); ?>px; background-color: <?php echo esc_attr($subframe_bg_color); ?>;">
                     <?php if ($use_subframe === 'yes'): ?>
                         <div class="image-subframe-container" 
                              style="height: <?php echo esc_attr($subframe_height); ?>%; width: 80%; margin: auto;">
@@ -1653,7 +1669,7 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
                 </div>
             <?php else: ?>
                 <div class="<?php echo esc_attr($container_classes); ?>" 
-                     style="height: <?php echo esc_attr($frame_height); ?>px; background: #f5f5f5;">
+                     style="height: <?php echo esc_attr($frame_height); ?>px; background-color: <?php echo esc_attr($subframe_bg_color); ?>;">
                     <?php if ($use_subframe === 'yes'): ?>
                         <div class="image-subframe-container" 
                              style="height: <?php echo esc_attr($subframe_height); ?>%; width: 80%; margin: auto; background: #e5e5e5;">
