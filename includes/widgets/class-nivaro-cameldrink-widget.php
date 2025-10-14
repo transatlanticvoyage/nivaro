@@ -435,6 +435,51 @@ class Nivaro_Cameldrink_Widget extends \Elementor\Widget_Base {
         
         $this->end_controls_section();
         
+        // General Widget Style Settings Section
+        $this->start_controls_section(
+            'general_widget_style_section',
+            [
+                'label' => __('general widget style settings', 'nivaro'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+        
+        $this->add_control(
+            'widget_border_radius',
+            [
+                'label' => __('border radius', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 50,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 8,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .cameldrink-service-box' => 'border-radius: {{SIZE}}{{UNIT}} !important;',
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'widget_background_color',
+            [
+                'label' => __('background-color', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .cameldrink-widget' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+        
+        $this->end_controls_section();
+        
         // Grid Style Section
         $this->start_controls_section(
             'grid_style_section',

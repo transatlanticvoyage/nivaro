@@ -47,7 +47,290 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
         return ['services', 'gambia', 'links', 'list', 'menu', 'nivaro'];
     }
     
+    /**
+     * Get preset options for dropdown
+     */
+    private function get_style_preset_options() {
+        $presets = $this->get_style_presets();
+        $options = [];
+        foreach ($presets as $key => $preset) {
+            $options[$key] = $preset['label'];
+        }
+        return $options;
+    }
+    
+    /**
+     * Style Presets Configuration
+     */
+    private function get_style_presets() {
+        return [
+            'orange_skin_1' => [
+                'label' => __('Orange Skin 1 (default)', 'nivaro'),
+                'settings' => [
+                    // General Widget Style
+                    'widget_border_radius' => ['size' => 24, 'unit' => 'px'],
+                    'widget_background_color' => '#E7851D',
+                    'widget_padding_top' => ['size' => 20, 'unit' => 'px'],
+                    'widget_padding_bottom' => ['size' => 20, 'unit' => 'px'],
+                    'widget_padding_left' => ['size' => 20, 'unit' => 'px'],
+                    'widget_padding_right' => ['size' => 20, 'unit' => 'px'],
+                    // Heading
+                    'heading_label_color' => '#ffffff',
+                    'heading_label_font_weight' => '700',
+                    'heading_label_font_family' => 'Helvetica, Arial, sans-serif',
+                    // Link Text
+                    'link_text_font_size' => ['size' => 21, 'unit' => 'px'],
+                    'link_text_color' => '#030303',
+                    'link_text_font_weight' => '500',
+                    // Current Page
+                    'current_page_background_color' => '#18293E',
+                    'current_page_text_color' => '#ffffff',
+                    // List Items
+                    'list_item_vertical_spacing' => ['size' => 26, 'unit' => 'px'],
+                    'list_item_padding_top' => ['size' => 5, 'unit' => 'px'],
+                    'list_item_padding_right' => ['size' => 14, 'unit' => 'px'],
+                    'list_item_padding_bottom' => ['size' => 5, 'unit' => 'px'],
+                    'list_item_padding_left' => ['size' => 14, 'unit' => 'px'],
+                    'list_item_border_radius' => ['size' => 9, 'unit' => 'px'],
+                ]
+            ],
+            'corporate_blue' => [
+                'label' => __('Corporate Blue', 'nivaro'),
+                'settings' => [
+                    // General Widget Style
+                    'widget_border_radius' => ['size' => 8, 'unit' => 'px'],
+                    'widget_background_color' => '#1e3a5f',
+                    'widget_padding_top' => ['size' => 25, 'unit' => 'px'],
+                    'widget_padding_bottom' => ['size' => 25, 'unit' => 'px'],
+                    'widget_padding_left' => ['size' => 25, 'unit' => 'px'],
+                    'widget_padding_right' => ['size' => 25, 'unit' => 'px'],
+                    // Heading
+                    'heading_label_color' => '#ffffff',
+                    'heading_label_font_weight' => '600',
+                    'heading_label_font_family' => 'Georgia, serif',
+                    // Link Text
+                    'link_text_font_size' => ['size' => 18, 'unit' => 'px'],
+                    'link_text_color' => '#e0e8f0',
+                    'link_text_font_weight' => '400',
+                    // Current Page
+                    'current_page_background_color' => '#4a90e2',
+                    'current_page_text_color' => '#ffffff',
+                    // List Items
+                    'list_item_vertical_spacing' => ['size' => 15, 'unit' => 'px'],
+                    'list_item_padding_top' => ['size' => 8, 'unit' => 'px'],
+                    'list_item_padding_right' => ['size' => 16, 'unit' => 'px'],
+                    'list_item_padding_bottom' => ['size' => 8, 'unit' => 'px'],
+                    'list_item_padding_left' => ['size' => 16, 'unit' => 'px'],
+                    'list_item_border_radius' => ['size' => 4, 'unit' => 'px'],
+                ]
+            ],
+            'dark_professional' => [
+                'label' => __('Dark Professional', 'nivaro'),
+                'settings' => [
+                    // General Widget Style
+                    'widget_border_radius' => ['size' => 12, 'unit' => 'px'],
+                    'widget_background_color' => '#2c2c2c',
+                    'widget_padding_top' => ['size' => 30, 'unit' => 'px'],
+                    'widget_padding_bottom' => ['size' => 30, 'unit' => 'px'],
+                    'widget_padding_left' => ['size' => 30, 'unit' => 'px'],
+                    'widget_padding_right' => ['size' => 30, 'unit' => 'px'],
+                    // Heading
+                    'heading_label_color' => '#ffffff',
+                    'heading_label_font_weight' => '300',
+                    'heading_label_font_family' => 'Roboto, sans-serif',
+                    // Link Text
+                    'link_text_font_size' => ['size' => 17, 'unit' => 'px'],
+                    'link_text_color' => '#b8b8b8',
+                    'link_text_font_weight' => '300',
+                    // Current Page
+                    'current_page_background_color' => '#ffffff',
+                    'current_page_text_color' => '#2c2c2c',
+                    // List Items
+                    'list_item_vertical_spacing' => ['size' => 12, 'unit' => 'px'],
+                    'list_item_padding_top' => ['size' => 10, 'unit' => 'px'],
+                    'list_item_padding_right' => ['size' => 20, 'unit' => 'px'],
+                    'list_item_padding_bottom' => ['size' => 10, 'unit' => 'px'],
+                    'list_item_padding_left' => ['size' => 20, 'unit' => 'px'],
+                    'list_item_border_radius' => ['size' => 6, 'unit' => 'px'],
+                ]
+            ],
+            'minimal_clean' => [
+                'label' => __('Minimal Clean', 'nivaro'),
+                'settings' => [
+                    // General Widget Style
+                    'widget_border_radius' => ['size' => 0, 'unit' => 'px'],
+                    'widget_background_color' => '#ffffff',
+                    'widget_padding_top' => ['size' => 40, 'unit' => 'px'],
+                    'widget_padding_bottom' => ['size' => 40, 'unit' => 'px'],
+                    'widget_padding_left' => ['size' => 0, 'unit' => 'px'],
+                    'widget_padding_right' => ['size' => 0, 'unit' => 'px'],
+                    // Heading
+                    'heading_label_color' => '#000000',
+                    'heading_label_font_weight' => '400',
+                    'heading_label_font_family' => 'system-ui, -apple-system, sans-serif',
+                    // Link Text
+                    'link_text_font_size' => ['size' => 16, 'unit' => 'px'],
+                    'link_text_color' => '#333333',
+                    'link_text_font_weight' => '400',
+                    // Current Page
+                    'current_page_background_color' => 'transparent',
+                    'current_page_text_color' => '#000000',
+                    // List Items
+                    'list_item_vertical_spacing' => ['size' => 20, 'unit' => 'px'],
+                    'list_item_padding_top' => ['size' => 12, 'unit' => 'px'],
+                    'list_item_padding_right' => ['size' => 0, 'unit' => 'px'],
+                    'list_item_padding_bottom' => ['size' => 12, 'unit' => 'px'],
+                    'list_item_padding_left' => ['size' => 0, 'unit' => 'px'],
+                    'list_item_border_radius' => ['size' => 0, 'unit' => 'px'],
+                ]
+            ],
+        ];
+    }
+    
     protected function register_controls() {
+        
+        // Style Preset Section - At the very top
+        $this->start_controls_section(
+            'style_preset_section',
+            [
+                'label' => __('Style Preset', 'nivaro'),
+                'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+            ]
+        );
+        
+        $this->add_control(
+            'style_preset_selector',
+            [
+                'label' => __('Choose Style Preset', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => 'orange_skin_1',
+                'options' => $this->get_style_preset_options(),
+                'label_block' => true,
+            ]
+        );
+        
+        // Add preset data as a hidden control
+        $this->add_control(
+            'style_preset_data',
+            [
+                'type' => \Elementor\Controls_Manager::HIDDEN,
+                'default' => json_encode($this->get_style_presets()),
+            ]
+        );
+        
+        $this->add_control(
+            'style_preset_apply_button',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => '
+                    <div style="margin-top: 15px;">
+                        <button type="button" 
+                                id="gambia-apply-preset" 
+                                class="elementor-button elementor-button-default" 
+                                style="width: 100%; padding: 10px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                            Apply Selected Preset
+                        </button>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666; font-style: italic;">
+                            After applying a preset, you can still customize individual settings below
+                        </p>
+                    </div>
+                    <script>
+                    (function() {
+                        // Wait for jQuery and Elementor to be available
+                        var checkReady = setInterval(function() {
+                            if (typeof jQuery !== "undefined" && jQuery("[data-setting=\'style_preset_selector\']").length) {
+                                clearInterval(checkReady);
+                                initGambiaPresets();
+                            }
+                        }, 100);
+                        
+                        function initGambiaPresets() {
+                            var $ = jQuery;
+                            var stylePresets = ' . json_encode($this->get_style_presets()) . ';
+                            
+                            console.log("Gambia presets initialized", stylePresets);
+                            
+                            // Apply preset button click handler
+                            $(document).off("click.gambiaPreset").on("click.gambiaPreset", "#gambia-apply-preset", function(e) {
+                                e.preventDefault();
+                                console.log("Apply preset clicked");
+                                
+                                var selectedPreset = $("[data-setting=\'style_preset_selector\']").val();
+                                console.log("Selected preset:", selectedPreset);
+                                
+                                if (!selectedPreset || !stylePresets[selectedPreset]) {
+                                    console.log("No valid preset selected");
+                                    return;
+                                }
+                                
+                                var presetSettings = stylePresets[selectedPreset].settings;
+                                console.log("Applying settings:", presetSettings);
+                                
+                                // Apply each preset setting to its corresponding control
+                                for (var settingKey in presetSettings) {
+                                    var settingValue = presetSettings[settingKey];
+                                    
+                                    // Find the control container
+                                    var $controlContainer = $(".elementor-control-" + settingKey);
+                                    
+                                    if ($controlContainer.length) {
+                                        var $input = $controlContainer.find("input, select, textarea").first();
+                                        
+                                        if ($input.length) {
+                                            // Handle different control types
+                                            if (typeof settingValue === "object" && settingValue.size !== undefined) {
+                                                // Slider control
+                                                $input.val(settingValue.size);
+                                                $input.trigger("input").trigger("change");
+                                                
+                                                // Update the slider UI
+                                                var $slider = $controlContainer.find(".elementor-slider");
+                                                if ($slider.length && $slider.data("uiSlider")) {
+                                                    $slider.slider("value", settingValue.size);
+                                                }
+                                            } else if ($input.attr("type") === "color" || $controlContainer.hasClass("elementor-control-type-color")) {
+                                                // Color control
+                                                $input.val(settingValue);
+                                                $input.trigger("input").trigger("change");
+                                                
+                                                // Update color picker button if exists
+                                                var $colorButton = $controlContainer.find(".pcr-button");
+                                                if ($colorButton.length) {
+                                                    $colorButton.css("color", settingValue);
+                                                }
+                                            } else {
+                                                // Regular control
+                                                $input.val(settingValue);
+                                                $input.trigger("input").trigger("change");
+                                            }
+                                            
+                                            console.log("Set " + settingKey + " to", settingValue);
+                                        }
+                                    }
+                                }
+                                
+                                // Show success message
+                                $("#gambia-apply-preset").text("Preset Applied!");
+                                $("#gambia-apply-preset").css("background", "#46b450");
+                                
+                                // Reset button after 2 seconds
+                                setTimeout(function() {
+                                    $("#gambia-apply-preset").text("Apply Selected Preset");
+                                    $("#gambia-apply-preset").css("background", "#007cba");
+                                }, 2000);
+                                
+                                // Trigger Elementor to recognize changes
+                                if (typeof elementor !== "undefined") {
+                                    elementor.reloadPreview();
+                                }
+                            });
+                        }
+                    })();
+                    </script>',
+            ]
+        );
+        
+        $this->end_controls_section();
         
         // Content Section
         $this->start_controls_section(
@@ -298,7 +581,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 10,
+                    'size' => 24,
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .gambia-widget' => 'border-radius: {{SIZE}}{{UNIT}};',
@@ -311,9 +594,97 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('background-color', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '',
+                'default' => '#E7851D',
                 'selectors' => [
                     '{{WRAPPER}} .gambia-widget' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'widget_padding_top',
+            [
+                'label' => __('padding-top', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 20,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .gambia-widget' => 'padding-top: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'widget_padding_bottom',
+            [
+                'label' => __('padding-bottom', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 20,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .gambia-widget' => 'padding-bottom: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'widget_padding_left',
+            [
+                'label' => __('padding-left', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 20,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .gambia-widget' => 'padding-left: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+        
+        $this->add_control(
+            'widget_padding_right',
+            [
+                'label' => __('padding-right', 'nivaro'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 20,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .gambia-widget' => 'padding-right: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -343,7 +714,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('color', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#333333',
+                'default' => '#ffffff',
                 'selectors' => [
                     '{{WRAPPER}} .gambia-list-heading' => 'color: {{VALUE}} !important;',
                 ],
@@ -355,7 +726,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('font weight', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::SELECT,
-                'default' => '600',
+                'default' => '700',
                 'options' => [
                     '300' => __('300 (Light)', 'nivaro'),
                     '400' => __('400 (Normal)', 'nivaro'),
@@ -375,7 +746,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('font family', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::FONT,
-                'default' => '',
+                'default' => 'Helvetica, Arial, sans-serif',
                 'selectors' => [
                     '{{WRAPPER}} .gambia-list-heading' => 'font-family: {{VALUE}};',
                 ],
@@ -413,7 +784,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 16,
+                    'size' => 21,
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .gambia-service-link' => 'font-size: {{SIZE}}{{UNIT}};',
@@ -426,7 +797,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('color', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#007cba',
+                'default' => '#030303',
                 'selectors' => [
                     '{{WRAPPER}} .gambia-service-link' => 'color: {{VALUE}} !important;',
                     '{{WRAPPER}} .gambia-service-link:visited' => 'color: {{VALUE}} !important;',
@@ -439,7 +810,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('font weight', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::SELECT,
-                'default' => '400',
+                'default' => '500',
                 'options' => [
                     '300' => __('300 (Light)', 'nivaro'),
                     '400' => __('400 (Normal)', 'nivaro'),
@@ -488,7 +859,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __('background-color', 'nivaro'),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#007cba',
+                'default' => '#18293E',
                 'selectors' => [
                     '{{WRAPPER}} .gambia-services-list li.current-page' => 'background-color: {{VALUE}};',
                 ],
@@ -538,7 +909,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 10,
+                    'size' => 26,
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .gambia-services-list li' => 'margin-bottom: {{SIZE}}{{UNIT}};',
@@ -666,7 +1037,7 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 7,
+                    'size' => 9,
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .gambia-services-list li' => 'border-radius: {{SIZE}}{{UNIT}};',
@@ -783,17 +1154,13 @@ class Nivaro_Gambia_Widget extends \Elementor\Widget_Base {
         $widget_width = isset($settings['widget_width_desktop']) ? $settings['widget_width_desktop'] : ['size' => 370, 'unit' => 'px'];
         $width_value = $widget_width['size'] . $widget_width['unit'];
         
-        $border_radius = isset($settings['widget_border_radius']) ? $settings['widget_border_radius'] : ['size' => 10, 'unit' => 'px'];
-        $radius_value = $border_radius['size'] . $border_radius['unit'];
-        
         $background_color = $settings['widget_background_color'] ?? '';
         
-        // Build inline styles
+        // Build inline styles (removed border-radius since it's handled by CSS selector)
         $widget_styles = sprintf(
-            'max-width: %s; border-radius: %s;%s',
+            'max-width: %s;%s',
             esc_attr($width_value),
-            esc_attr($radius_value),
-            $background_color ? ' background-color: ' . esc_attr($background_color) . '; padding: 20px;' : ''
+            $background_color ? ' background-color: ' . esc_attr($background_color) . ';' : ''
         );
         
         ?>
