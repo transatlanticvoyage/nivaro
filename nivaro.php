@@ -131,6 +131,11 @@ class Nivaro {
             require_once $gambia_file;
         }
         
+        $sahara_file = NIVARO_PLUGIN_PATH . 'includes/widgets/class-nivaro-sahara-widget.php';
+        if (file_exists($sahara_file)) {
+            require_once $sahara_file;
+        }
+        
         // Load container extensions
         $coyote_file = NIVARO_PLUGIN_PATH . 'includes/extensions/class-nivaro-coyote-box-extension.php';
         if (file_exists($coyote_file)) {
@@ -217,6 +222,15 @@ class Nivaro {
                 error_log('Nivaro: Failed to register Gambia widget - ' . $e->getMessage());
             }
         }
+        
+        // Register Sahara Widget
+        if (class_exists('Nivaro_Sahara_Widget')) {
+            try {
+                $widgets_manager->register(new Nivaro_Sahara_Widget());
+            } catch (Exception $e) {
+                error_log('Nivaro: Failed to register Sahara widget - ' . $e->getMessage());
+            }
+        }
     }
     
     /**
@@ -251,7 +265,7 @@ class Nivaro {
             return false;
         }
         
-        $nivaro_widgets = array('nivaro-leatherback', 'nivaro-gecko', 'nivaro-ocelot-service', 'nivaro-cameldrink', 'nivaro-gambia');
+        $nivaro_widgets = array('nivaro-leatherback', 'nivaro-gecko', 'nivaro-ocelot-service', 'nivaro-cameldrink', 'nivaro-gambia', 'nivaro-sahara');
         
         foreach ($elements as $element) {
             if (isset($element['widgetType']) && in_array($element['widgetType'], $nivaro_widgets)) {
@@ -305,6 +319,14 @@ class Nivaro {
         wp_enqueue_style(
             'nivaro-gambia',
             NIVARO_PLUGIN_URL . 'assets/css/nivaro-gambia.css',
+            array(),
+            NIVARO_PLUGIN_VERSION
+        );
+        
+        // Enqueue Sahara styles
+        wp_enqueue_style(
+            'nivaro-sahara',
+            NIVARO_PLUGIN_URL . 'assets/css/nivaro-sahara.css',
             array(),
             NIVARO_PLUGIN_VERSION
         );

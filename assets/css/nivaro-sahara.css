@@ -1,0 +1,23 @@
+/**
+ * Nivaro Sahara Widget Styles
+ */
+
+.nivaro-sahara-widget {
+    line-height: 1;
+}
+
+.nivaro-sahara-widget img {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 100%;
+    height: auto;
+}
+
+.nivaro-sahara-widget a {
+    display: inline-block;
+}
+
+/* Ensure proper responsive behavior */
+.nivaro-sahara-widget img {
+    width: 100%;
+}
